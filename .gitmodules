@@ -1,0 +1,3 @@
+[submodule "assorted-sub-workflows"]
+	path = assorted-sub-workflows
+	url = git@github.com:sanger-pathogens/assorted-sub-workflows.git
