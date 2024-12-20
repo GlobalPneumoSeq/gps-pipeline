@@ -85,13 +85,70 @@ It is recommended to have at least 16GB of RAM and 100GB of free storage
 > - The pipeline generates ~1.8GB intermediate files for each sample on average
 >     - These files can be removed when the pipeline run is completed, please refer to [Clean Up](#clean-up)
 >     - To further reduce storage requirement by sacrificing the ability to resume the pipeline, please refer to [Experimental](#experimental)
+
 ## Accepted Inputs
 - Only Illumina paired-end short reads are supported
-- Each sample is expected to be a pair of raw reads following this file name pattern: 
-    - `*_{,R}{1,2}{,_001}.{fq,fastq}{,.gz}` 
-        - example 1: `SampleName_R1_001.fastq.gz`, `SampleName_R2_001.fastq.gz`
-        - example 2: `SampleName_1.fastq.gz`, `SampleName_2.fastq.gz`
-        - example 3: `SampleName_R1.fq`, `SampleName_R2.fq`
+- Any combination of the following input options are supported:
+  1. `--reads`:  
+     Specify a directory of per-sample paired   (gzipped) fastq files containing reads   (files named according to the following   pattern `*_{,R}{1,2}{,_001}.{fq,fastq}{,.gz}`):
+       - example 1: `SampleName_R1_001.  fastq.gz`, `SampleName_R2_001.fastq.gz`
+       - example 2: `SampleName_1.fastq.  gz`, `SampleName_2.fastq.gz`
+       - example 3: `SampleName_R1.fq`,   `SampleName_R2.fq`
+
+  2. `--manifest_of_reads` or `--manifest`:  
+     Specify the paths to (gzipped) fastq files
+     containing reads via a CSV manifest, listing the pair of read files pertaining to a sample, one per row.
+      
+  3. **iRODS attribute parameters** (Sanger HPC only):  
+     Specify a combination of iRODS attributes to search for reads to use as pipeline input.
+
+     The selected set of data files is defined by a combination of parameters: `--studyid`, `--runid`, `--laneid`, `--plexid`, `--target` and `--type` (these refer to specifics of the sequencing experiment and data to be retrieved).
+
+     Each parameter restricts the set of data files that match and will be downloaded. With the exception of `--type` and `--target`, omitting an option causes samples for all possible values of the parameter to be retrieved.
+
+     Either `--studyid` or `--runid` is required.While `--laneid`, `--plexid`, `--target` and `--type` are optional. This avoids indiscriminately and unintentionally downloading thousands of files.
+     ```
+      --studyid
+            default: -1
+            Sequencing Study ID
+      --runid
+            default: -1
+            Sequencing Run ID
+      --laneid
+            default: -1
+            Sequencing Lane ID
+      --plexid
+            default: -1
+            Sequencing Plex ID
+      --target
+            default: 1
+            Marker of key data product likely to be of interest to customer
+      --type
+            default: cram
+            File type
+     ```
+      
+  4. `--manifest_of_lanes` (Sanger HPC only):  
+     Specify a CSV manifest listing a batch of iRODS parameter combinations.
+     
+     Valid column headings include the individual parameter options described above: `studyid`, `runid`, `laneid`, `plexid`, or any other iRODS metadata attribute, e.g. `sample_common_name`, `sample_supplier_name`.
+     Corresponding fields in the CSV manifest file can be left blank.
+     
+     `laneid` and `plexid` are only considered when provided alongside a `studyid` or `runid`.
+       - example 1:
+         ```
+         studyid,runid,laneid,plexid
+         ,37822,2,354
+         5970,37822,,332
+         5970,37822,2,
+         ```
+       - example 2:
+         ```
+         sample_common_name,type,target
+         Romboutsia lituseburensis,cram,1
+         Romboutsia lituseburensis,cram,0
+         ```
+
 ## Setup 
 > [!WARNING]
 > - Docker or Singularity must be running
@@ -153,6 +210,7 @@ It is recommended to have at least 16GB of RAM and 100GB of free storage
     | `standard`<br> (Default) | Docker is used as the container engine. <br> Processes are executed locally. |
     | `singularity` |  Singularity is used as the container engine. <br> Processes are executed locally. |
     | `lsf` | **The pipeline should be launched from a LSF cluster head node with this profile.** <br>Singularity is used as the container engine. <br> Processes are submitted to your LSF cluster via `bsub` by the pipeline. <br> (Tested on Wellcome Sanger Institute farm5 LSF cluster only) <br> (Option `--kraken2_memory_mapping` default change to `false`.) |
+    | `sanger` | **Only required for Sanger HPC cluster.** <br>Intended to be used in combination with `lsf` profile. |
 
 ## Resume
 > [!TIP]

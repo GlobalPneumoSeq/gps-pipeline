@@ -28,10 +28,11 @@ void helpMessage() {
         |./run_pipeline [option] [value]
         |
         |All options are optional, some common options:
-        |--reads [PATH]    Path to the input directory that contains the reads to be processed
-        |--output [PATH]   Path to the output directory that save the results
-        |--init          Alternative workflow for initialisation
-        |--version       Alternative workflow for getting versions of pipeline, container images, tools and databases
+        |--reads [PATH]     Path to the input directory that contains the reads to be processed
+        |--manifest [PATH]  Path to input CSV (headings: ID,R1,R2), listing a pair (gzipped) fastq files pertaining to a sample, one per row
+        |--output [PATH]    Path to the output directory that save the results
+        |--init             Alternative workflow for initialisation
+        |--version          Alternative workflow for getting versions of pipeline, container images, tools and databases
         |
         |For all available options, please refer to README.md
         '''.stripMargin()

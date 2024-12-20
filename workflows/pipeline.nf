@@ -10,6 +10,9 @@ include { MLST } from "$projectDir/modules/mlst"
 include { PBP_RESISTANCE; PARSE_PBP_RESISTANCE; GET_ARIBA_DB; OTHER_RESISTANCE; PARSE_OTHER_RESISTANCE } from "$projectDir/modules/amr"
 include { GENERATE_SAMPLE_REPORT; GENERATE_OVERALL_REPORT } from "$projectDir/modules/output"
 
+// Import subworkflows
+include { MIXED_INPUT } from "$projectDir/assorted-sub-workflows/mixed_input/mixed_input"
+
 // Main pipeline workflow
 workflow PIPELINE {
     main:
@@ -29,8 +32,17 @@ workflow PIPELINE {
     // Get path to ARIBA database, generate from reference sequences and metadata if ncessary
     GET_ARIBA_DB(params.ariba_ref, params.ariba_metadata, params.db)
 
+    // Obtain input from manifests and iRODS params
+    MIXED_INPUT
+    | map { meta, R1, R2 -> [meta.ID, [R1, R2]] }
+    | set { raw_read_pairs_ch }
+
     // Get read pairs into Channel raw_read_pairs_ch
-    raw_read_pairs_ch = Channel.fromFilePairs("$params.reads/*_{,R}{1,2}{,_001}.{fq,fastq}{,.gz}", checkIfExists: true)
+    if (params.reads) {
+        Channel.fromFilePairs("$params.reads/*_{,R}{1,2}{,_001}.{fq,fastq}{,.gz}", checkIfExists: true)
+        | mix(raw_read_pairs_ch)
+        | set { raw_read_pairs_ch }
+    }
 
     // Basic input files validation
     // Output into Channel FILE_VALIDATION.out.result
@@ -114,7 +126,7 @@ workflow PIPELINE {
     // Merge Channels FILE_VALIDATION.out.result & READ_QC.out.result & ASSEMBLY_QC.out.result & MAPPING_QC.out.result & TAXONOMY_QC.out.result to provide Overall QC Status
     // Output into Channel OVERALL_QC.out.result & OVERALL_QC.out.report
     OVERALL_QC(
-        raw_read_pairs_ch.map{ it[0] }
+        raw_read_pairs_ch.map{ [it[0]] }
         .join(FILE_VALIDATION.out.result, failOnDuplicate: true, remainder: true)
         .join(READ_QC.out.result, failOnDuplicate: true, remainder: true)
         .join(ASSEMBLY_QC.out.result, failOnDuplicate: true, remainder: true)
@@ -161,7 +173,7 @@ workflow PIPELINE {
 
     // Generate sample reports by merging outputs from all result-generating modules
     GENERATE_SAMPLE_REPORT(
-        raw_read_pairs_ch.map{ it[0] }
+        raw_read_pairs_ch.map{ [it[0]] }
         .join(READ_QC.out.report, failOnDuplicate: true, remainder: true)
         .join(ASSEMBLY_QC.out.report, failOnDuplicate: true, remainder: true)
         .join(MAPPING_QC.out.report, failOnDuplicate: true, remainder: true)

@@ -1,3 +1,41 @@
+// Map of valid parameters for which to skip validation
+skipValidationParams = [
+    // From common config
+    input: 'skip',
+    tracedir: 'skip',
+    max_memory: 'skip',
+    max_cpus: 'skip',
+    max_time: 'skip',
+    max_retries: 'skip',
+    retry_strategy: 'skip',
+    queue_size: 'skip',
+    submit_rate_limit: 'skip',
+    // From mixed input config
+    outdir: 'skip',
+    manifest_of_reads: 'skip',
+    manifest_of_lanes: 'skip',
+    manifest: 'skip',
+    save_metadata: 'skip',
+    combine_same_id_crams: 'skip',
+    dehumanising_method: 'skip',
+    cleanup_intermediate_files_irods_extractor: 'skip',
+    save_fastqs: 'skip',
+    save_method: 'skip',
+    raw_reads_prefix: 'skip',
+    preexisting_fastq_tag: 'skip',
+    split_sep_for_ID_from_fastq: 'skip',
+    lane_plex_sep: 'skip',
+    start_queue: 'skip',
+    irods_subset_to_skip: 'skip',
+    short_metacsv_name: 'skip',
+    studyid: 'skip',
+    runid: 'skip',
+    laneid: 'skip',
+    plexid: 'skip',
+    target: 'skip',
+    type: 'skip'
+] 
+
 // Map of valid parameters and their value types
 validParams = [
     help: 'boolean',
@@ -30,6 +68,8 @@ validParams = [
     resistance_to_mic: 'path_tsv',
     lite: 'boolean'
 ]
+
+validParams += skipValidationParams
 
 // Validate whether all provided parameters are valid
 void validate(Map params) {
