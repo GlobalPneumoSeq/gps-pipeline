@@ -1,5 +1,6 @@
 #!/usr/bin/env nextflow
 
+
 // Import workflow modules
 include { PIPELINE } from './workflows/pipeline'
 include { INIT } from './workflows/init'

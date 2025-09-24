@@ -14,7 +14,7 @@ The development of this pipeline is part of the GPS Project ([Global Pneumococca
 ## Citation
 If you have used the GPS Pipeline in your research, please cite us in your relevant publications:
 
-> Harry C. H. Hung, Narender Kumar, Victoria Dyster, Corin Yeats, Benjamin Metcalf, Yuan Li, Paulina A. Hawkins, Lesley McGee, Stephen D. Bentley, and Stephanie W. Lo. **A Portable and Scalable Genomic Analysis Pipeline for *Streptococcus pneumoniae* Surveillance: GPS Pipeline**. *bioRxiv* 2024.11.27.625679 **[Preprint]**.  doi: [10.1101/2024.11.27.625679](https://doi.org/10.1101/2024.11.27.625679)
+> Harry C. H. Hung, Narender Kumar, Victoria Dyster, Corin Yeats, Benjamin Metcalf, Yuan Li, Paulina A. Hawkins, Lesley McGee, Stephen D. Bentley, and Stephanie W. Lo. **GPS Pipeline: portable, scalable genomic pipeline for *Streptococcus pneumoniae* surveillance from Global Pneumococcal Sequencing Project**. *Nat Commun* **16**, 8345 (2025). https://doi.org/10.1038/s41467-025-64018-5
 
 
 &nbsp;
