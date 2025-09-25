@@ -19,6 +19,7 @@ ARIBA=$(find_image ariba)
 MLST=$(find_image mlst)
 KRAKEN2=$(find_image kraken2)
 SEROBA=$(find_image seroba)
+BAKTA=$(find_image bakta)
 
 add_container () {
     jq -n --arg container "$1" '.container = $container'
@@ -40,4 +41,5 @@ jq -n \
     --argjson mlst "$(add_container "$MLST")" \
     --argjson kraken2 "$(add_container "$KRAKEN2")" \
     --argjson seroba "$(add_container "$SEROBA")" \
+    --argjson bakta "$(add_container "$BAKTA")" \
     '$ARGS.named' > "$JSON_FILE"

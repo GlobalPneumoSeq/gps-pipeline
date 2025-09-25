@@ -1,63 +1,114 @@
 #!/usr/bin/env nextflow
 
-// Version of this release
-pipelineVersion = '1.0.0'
 
 // Import workflow modules
-include { PIPELINE } from "$projectDir/workflows/pipeline"
-include { INIT } from "$projectDir/workflows/init"
-include { PRINT_VERSION; SAVE_INFO } from "$projectDir/workflows/info_and_version"
+include { PIPELINE } from './workflows/pipeline'
+include { INIT } from './workflows/init'
+include { PRINT_VERSION; SAVE_INFO } from './workflows/info_and_version'
 
-// Import supporting modules
-include { startMessage; helpMessage; workflowSelectMessage; endMessage } from "$projectDir/modules/messages"
-include { validate } from "$projectDir/modules/validate"
-include { singularityPreflight } from "$projectDir/modules/singularity"
 
-// Safeguard Nextflow minimum version, in case user is not using the included executable
-nextflowMinVersion = '23.10' 
-if( !nextflow.version.matches(">=${nextflowMinVersion}") ) {
-    log.error("The pipeline requires Nextflow version ${nextflowMinVersion} or greater -- You are running version $nextflow.version") 
-    System.exit(1)
-}
-
-// Start message
-startMessage(pipelineVersion)
-
-// Validate parameters
-validate(params)
-
-// If Singularity is used as the container engine and not showing help message, do preflight check to prevent parallel pull issues
-// Related issue: https://github.com/nextflow-io/nextflow/issues/1210
-if (workflow.containerEngine == 'singularity' & !params.help) {
-    singularityPreflight(workflow.container, params.singularity_cachedir)
-}
-
-// Select workflow with PIPELINE as default
 workflow {
+    // Start message
+    Messages.startMessage(workflow.manifest.version, log)
+
+    // Validate parameters
+    Validate.validate(params, workflow, log)
+
+    // If Singularity is used as the container engine and not showing help message, do preflight check to prevent parallel pull issues
+    // Related issue: https://github.com/nextflow-io/nextflow/issues/1210
+    if (workflow.containerEngine == 'singularity' & !params.help) {
+        Singularity.singularityPreflight(workflow.container, params.singularity_cachedir, log)
+    }
+
+    // Select workflow with PIPELINE as default
     if (params.help) {
-        helpMessage()
+        Messages.helpMessage(log)
     } else if (params.init) {
-        workflowSelectMessage('init')
-        INIT()
+        Messages.workflowSelectMessage('init', params, log)
+        INIT(
+            params.annotation,
+            params.db,
+            params.ref_genome,
+            params.ariba_ref,
+            params.ariba_metadata,
+            params.kraken2_db_remote,
+            params.seroba_db_remote,
+            params.seroba_kmer,
+            params.poppunk_db_remote,
+            params.poppunk_ext_remote,
+            params.bakta_db_remote
+        )
     } else if (params.version) {
-        workflowSelectMessage('version')
-        PRINT_VERSION(params.resistance_to_mic, pipelineVersion)
+        Messages.workflowSelectMessage('version', params, log)
+        PRINT_VERSION(
+            params.resistance_to_mic, 
+            workflow.manifest.version,
+            params.db,
+            params.assembler
+        )
     } else {
-        workflowSelectMessage('pipeline')
-        PIPELINE()
-        SAVE_INFO(PIPELINE.out.databases_info, params.resistance_to_mic, pipelineVersion)
+        Messages.workflowSelectMessage('pipeline', params, log)
+        PIPELINE(
+            params.annotation,
+            params.lite,
+            params.db,
+            params.ref_genome,
+            params.ariba_ref,
+            params.ariba_metadata,
+            params.kraken2_db_remote,
+            params.seroba_db_remote,
+            params.seroba_kmer,
+            params.poppunk_db_remote,
+            params.poppunk_ext_remote,
+            params.bakta_db_remote,
+            params.reads,
+            params.contigs,
+            params.length_low,
+            params.length_high,
+            params.depth,
+            params.min_contig_length,
+            params.assembler,
+            params.assembler_thread,
+            params.ref_coverage,
+            params.het_snp_site,
+            params.kraken2_memory_mapping,
+            params.spneumo_percentage,
+            params.non_strep_percentage,
+            params.resistance_to_mic,
+            params.output,
+            params.file_publish
+        )
+        SAVE_INFO(
+            PIPELINE.out.databases_info, 
+            params.resistance_to_mic, 
+            workflow.manifest.version,
+            params.assembler,
+            params.assembler_thread,
+            params.min_contig_length,
+            params.reads,
+            params.output,
+            params.contigs,
+            params.length_low,
+            params.length_high,
+            params.depth,
+            params.spneumo_percentage,
+            params.non_strep_percentage,
+            params.ref_coverage,
+            params.het_snp_site
+        )
+    }
+
+    // End message
+    workflow.onComplete = {
+        if (params.help) {
+            return
+        } else if (params.init) {
+            Messages.endMessage('init', params, workflow, log)
+        } else if (params.version) {
+            Messages.endMessage('version', params, workflow, log)
+        } else {
+            Messages.endMessage('pipeline', params, workflow, log)
+        }
     }
 }
 
-// End message
-workflow.onComplete {
-    if (params.help) {
-        return
-    } else if (params.init) {
-        endMessage('init')
-    } else if (params.version) {
-        endMessage('version')
-    } else {
-        endMessage('pipeline')
-    }
-}

@@ -16,11 +16,13 @@ process GET_SEROBA_DB {
     script:
     seroba_db="${db}/seroba"
     json='done_seroba.json'
+    checksum='checksum.md5'
     """
     DB_REMOTE="$remote"
     DB_LOCAL="$seroba_db"
     KMER="$kmer"
     JSON_FILE="$json"
+    CHECKSUM_FILE='$checksum'
 
     source check-create_seroba_db.sh
     """
