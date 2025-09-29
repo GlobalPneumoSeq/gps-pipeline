@@ -11,15 +11,17 @@ process GET_POPPUNK_DB {
 
     output:
     path poppunk_db, emit: path
-    env DB_NAME, emit: database
+    env 'DB_NAME', emit: database
 
     script:
     poppunk_db="${db}/poppunk"
     json='done_poppunk.json'
+    checksum='checksum.md5'
     """
     DB_REMOTE="$db_remote"
     DB_LOCAL="$poppunk_db"
     JSON_FILE="$json"
+    CHECKSUM_FILE='$checksum'
 
     source check-download_poppunk_db.sh
     """
@@ -38,15 +40,17 @@ process GET_POPPUNK_EXT_CLUSTERS {
 
     output:
     path poppunk_ext, emit: path
-    env EXT_CLUSTERS_CSV, emit: file
+    env 'EXT_CLUSTERS_CSV', emit: file
 
     script:
     poppunk_ext="${db}/poppunk_ext"
     json='done_poppunk_ext.json'
+    checksum='checksum.md5'
     """
     EXT_CLUSTERS_REMOTE="$ext_clusters_remote"
     EXT_CLUSTERS_LOCAL="$poppunk_ext"
     JSON_FILE="$json"
+    CHECKSUM_FILE='$checksum'
 
     source check-download_poppunk_ext_clusters.sh    
     """

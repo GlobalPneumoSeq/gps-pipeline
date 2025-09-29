@@ -15,10 +15,12 @@ process GET_KRAKEN2_DB {
     script:
     kraken2_db="${db}/kraken2"
     json='done_kraken.json'
+    checksum='checksum.md5'
     """
     DB_REMOTE="$remote"
     DB_LOCAL="$kraken2_db"
     JSON_FILE="$json"
+    CHECKSUM_FILE='$checksum'
 
     source check-download_kraken2_db.sh
     """
@@ -42,11 +44,11 @@ process TAXONOMY {
     script:
     report='kraken2_report.txt'
 
-    if (kraken2_memory_mapping === true)
+    if (kraken2_memory_mapping == true)
         """
         kraken2 --threads "`nproc`" --use-names --memory-mapping --db "$kraken2_db" --paired "$read1" "$read2" --report "$report" --output -
         """
-    else if (kraken2_memory_mapping === false)
+    else if (kraken2_memory_mapping == false)
         """
         kraken2 --threads "`nproc`" --use-names --db "$kraken2_db" --paired "$read1" "$read2" --report "$report" --output -
         """
@@ -67,7 +69,7 @@ process TAXONOMY_QC {
     val(qc_top_non_strep_genus_percentage)
 
     output:
-    tuple val(sample_id), env(TAXONOMY_QC), emit: result
+    tuple val(sample_id), env('TAXONOMY_QC'), emit: result
     tuple val(sample_id), path(taxonomy_qc_report), emit: report
 
     script:

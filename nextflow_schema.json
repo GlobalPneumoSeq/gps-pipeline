@@ -5,8 +5,8 @@
     "description": "",
     "type": "object",
     "definitions": {
-        "input_output": {
-            "title": "Input / Output",
+        "input_output_options": {
+            "title": "Input / Output Options",
             "type": "object",
             "description": "",
             "default": "",
@@ -31,9 +31,9 @@
                     "description": "(Only required when Singularity is used) Path to the directory where Singularity images should be saved to.",
                     "format": "directory-path"
                 },
-                "assembly_publish": {
+                "file_publish": {
                     "type": "string",
-                    "description": "Method used by Nextflow to publish the generated assemblies.",
+                    "description": "Method used by Nextflow to publish the generated assemblies and annotations (if selected).",
                     "hidden": true,
                     "enum": [
                         "link",
@@ -46,7 +46,7 @@
                 "reads",
                 "output",
                 "db",
-                "assembly_publish"
+                "file_publish"
             ]
         },
         "qc_parameters": {
@@ -118,8 +118,8 @@
                 "depth"
             ]
         },
-        "assembly": {
-            "title": "Assembly",
+        "assembly_options": {
+            "title": "Assembly Options",
             "type": "object",
             "description": "",
             "default": "",
@@ -147,12 +147,12 @@
             },
             "required": [
                 "assembler",
-                "min_contig_length",
-                "assembler_thread"
+                "assembler_thread",
+                "min_contig_length"
             ]
         },
-        "mapping": {
-            "title": "Mapping",
+        "mapping_options": {
+            "title": "Mapping Options",
             "type": "object",
             "description": "",
             "default": "",
@@ -170,8 +170,8 @@
                 "ref_genome"
             ]
         },
-        "taxonomy": {
-            "title": "Taxonomy",
+        "taxonomy_options": {
+            "title": "Taxonomy Options",
             "type": "object",
             "description": "",
             "default": "",
@@ -193,8 +193,8 @@
                 "kraken2_memory_mapping"
             ]
         },
-        "serotype": {
-            "title": "Serotype",
+        "serotype_options": {
+            "title": "Serotype Options",
             "type": "object",
             "description": "",
             "default": "",
@@ -217,8 +217,8 @@
                 "seroba_kmer"
             ]
         },
-        "lineage": {
-            "title": "Lineage",
+        "lineage_options": {
+            "title": "Lineage Options",
             "type": "object",
             "description": "",
             "default": "",
@@ -241,8 +241,23 @@
                 "poppunk_ext_remote"
             ]
         },
-        "other_amr": {
-            "title": "Other AMR",
+        "annotation_options": {
+            "type": "boolean",
+            "hidden": true,
+            "description": "Enable optional annotation module",
+            "title": "Annotation Options",
+            "default": false,
+            "properties": {
+                "bakta_db_remote": {
+                    "type": "string",
+                    "hidden": true,
+                    "description": "URL to a Bakta database.",
+                    "pattern": "^(https?:\\/\\/)?(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)\\.(tar.xz)$"
+                }
+            }
+        },
+        "other_amr_options": {
+            "title": "Other AMR Options",
             "type": "object",
             "description": "",
             "default": "",
@@ -277,32 +292,78 @@
                 "ariba_metadata",
                 "resistance_to_mic"
             ]
+        },
+        "workflow_selection": {
+            "title": "Workflow Selection",
+            "type": "object",
+            "description": "Workflow and optional module selection",
+            "default": "",
+            "properties": {
+                "help": {
+                    "type": "boolean",
+                    "description": "Alternative workflow for help message",
+                    "hidden": true
+                },
+                "init": {
+                    "type": "boolean",
+                    "description": "Alternative workflow for initialisation only",
+                    "hidden": true
+                },
+                "version": {
+                    "type": "boolean",
+                    "description": "Alternative workflow for getting versions of pipeline and tools",
+                    "hidden": true
+                },
+                "annotation": {
+                    "type": "boolean",
+                    "hidden": true,
+                    "description": "Enable optional annotation module"
+                },
+                "lite": {
+                    "type": "boolean",
+                    "description": "Enable experimental storage reduction (break the -resume function of Nextflow)",
+                    "hidden": true
+                }
+            },
+            "required": [
+                "help",
+                "init",
+                "version",
+                "annotation",
+                "lite"
+            ]
         }
     },
     "allOf": [
         {
-            "$ref": "#/definitions/input_output"
+            "$ref": "#/definitions/input_output_options"
         },
         {
             "$ref": "#/definitions/qc_parameters"
         },
         {
-            "$ref": "#/definitions/assembly"
+            "$ref": "#/definitions/assembly_options"
         },
         {
-            "$ref": "#/definitions/mapping"
+            "$ref": "#/definitions/mapping_options"
         },
         {
-            "$ref": "#/definitions/taxonomy"
+            "$ref": "#/definitions/taxonomy_options"
         },
         {
-            "$ref": "#/definitions/serotype"
+            "$ref": "#/definitions/serotype_options"
         },
         {
-            "$ref": "#/definitions/lineage"
+            "$ref": "#/definitions/lineage_options"
         },
         {
-            "$ref": "#/definitions/other_amr"
+            "$ref": "#/definitions/annotation_options"
+        },
+        {
+            "$ref": "#/definitions/other_amr_options"
+        },
+        {
+            "$ref": "#/definitions/workflow_selection"
         }
     ]
 }

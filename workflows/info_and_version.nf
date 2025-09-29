@@ -1,24 +1,32 @@
-include { IMAGES; DATABASES; TOOLS; COMBINE_INFO; PARSE; PRINT; SAVE; PYTHON_VERSION; FASTP_VERSION; UNICYCLER_VERSION; SHOVILL_VERSION; QUAST_VERSION; BWA_VERSION; SAMTOOLS_VERSION; BCFTOOLS_VERSION; POPPUNK_VERSION; MLST_VERSION; KRAKEN2_VERSION; SEROBA_VERSION; ARIBA_VERSION } from "$projectDir/modules/info"
+include { IMAGES; DATABASES; TOOLS; COMBINE_INFO; PARSE; PRINT; SAVE; PYTHON_VERSION; FASTP_VERSION; UNICYCLER_VERSION; SHOVILL_VERSION; QUAST_VERSION; BWA_VERSION; SAMTOOLS_VERSION; BCFTOOLS_VERSION; POPPUNK_VERSION; MLST_VERSION; KRAKEN2_VERSION; SEROBA_VERSION; ARIBA_VERSION; BAKTA_VERSION} from '../modules/info'
 
 // Alternative workflow that prints versions of pipeline and tools
 workflow PRINT_VERSION {
     take:
         resistance_to_mic
         pipeline_version
+        db
+        assembler
 
     main:
         GET_VERSION(
-            "${params.db}/bwa",
-            "${params.db}/ariba",
-            "${params.db}/kraken2",
-            "${params.db}/seroba",
-            "${params.db}/poppunk",
-            "${params.db}/poppunk_ext",
+            "${db}/bwa",
+            "${db}/ariba",
+            "${db}/kraken2",
+            "${db}/seroba",
+            "${db}/poppunk",
+            "${db}/poppunk_ext",
+            "${db}/bakta",
             resistance_to_mic,
             pipeline_version
-        ) \
-        | PARSE \
-        | PRINT
+        )
+        
+        PARSE(
+            GET_VERSION.out.json,
+            assembler
+        )
+        
+        PRINT(PARSE.out.text)
 }
 
 // Sub-workflow of PIPELINE workflow the save versions of pipeline and tools, and QC parameters to info.txt at output dir
@@ -27,6 +35,20 @@ workflow SAVE_INFO {
         databases_info
         resistance_to_mic
         pipeline_version
+        assembler
+        assembler_thread
+        min_contig_length
+        reads
+        output
+        contigs
+        length_low
+        length_high
+        depth
+        spneumo_percentage
+        non_strep_percentage
+        ref_coverage
+        het_snp_site
+
 
     main:
         GET_VERSION(
@@ -36,11 +58,32 @@ workflow SAVE_INFO {
             databases_info.seroba_db_path,
             databases_info.poppunk_db_path,
             databases_info.poppunk_ext_path,
+            databases_info.bakta_db_path,
             resistance_to_mic,
             pipeline_version
-        ) \
-       | PARSE \
-       | SAVE
+        )
+
+       PARSE(
+            GET_VERSION.out.json,
+            assembler
+        )
+       
+       SAVE(
+            PARSE.out.text,
+            reads,
+            output,
+            assembler,
+            assembler_thread,
+            min_contig_length,
+            contigs,
+            length_low,
+            length_high,
+            depth,
+            spneumo_percentage,
+            non_strep_percentage,
+            ref_coverage,
+            het_snp_site
+        )
 }
 
 // Sub-workflow for generating a json that contains versions of pipeline and tools
@@ -52,6 +95,7 @@ workflow GET_VERSION {
         seroba_db_path
         poppunk_db_path
         poppunk_ext_path
+        bakta_db_path
         resistance_to_mic
         pipeline_version
 
@@ -69,6 +113,7 @@ workflow GET_VERSION {
             seroba_db_path,
             poppunk_db_path,
             poppunk_ext_path,
+            bakta_db_path,
             resistance_to_mic
         )
 
@@ -87,6 +132,7 @@ workflow GET_VERSION {
         KRAKEN2_VERSION()
         SEROBA_VERSION()
         ARIBA_VERSION()
+        BAKTA_VERSION()
 
         TOOLS(
             PYTHON_VERSION.out,
@@ -101,7 +147,8 @@ workflow GET_VERSION {
             MLST_VERSION.out,
             KRAKEN2_VERSION.out,
             SEROBA_VERSION.out,
-            ARIBA_VERSION.out
+            ARIBA_VERSION.out,
+            BAKTA_VERSION.out
         )
 
         COMBINE_INFO(
@@ -113,5 +160,5 @@ workflow GET_VERSION {
         )
 
     emit:
-        COMBINE_INFO.out.json
+        json = COMBINE_INFO.out.json
 }

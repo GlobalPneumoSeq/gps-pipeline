@@ -16,11 +16,13 @@ process GET_REF_GENOME_BWA_DB {
     bwa_db="${db}/bwa"
     prefix='reference'
     json='done_bwa_db.json'
+    checksum='checksum.md5'
     """
     REFERENCE="$reference"
     DB_LOCAL="$bwa_db"
     PREFIX="$prefix"
     JSON_FILE="$json"
+    CHECKSUM_FILE='$checksum'
 
     source check-create_ref_genome_bwa_db.sh
     """
@@ -63,7 +65,7 @@ process SAM_TO_SORTED_BAM {
 
     output:
     tuple val(sample_id), path(sorted_bam), emit: sorted_bam
-    tuple val(sample_id), env(COVERAGE), emit: ref_coverage
+    tuple val(sample_id), env('COVERAGE'), emit: ref_coverage
 
     script:
     sorted_bam="${sample_id}_mapped_sorted.bam"
@@ -118,7 +120,7 @@ process HET_SNP_COUNT {
     tuple val(sample_id), path(vcf)
 
     output:
-    tuple val(sample_id), env(OUTPUT), emit: result
+    tuple val(sample_id), env('OUTPUT'), emit: result
 
     script:
     het_snp_count_output='output.txt'
@@ -141,7 +143,7 @@ process MAPPING_QC {
     val(qc_het_snp_site)
 
     output:
-    tuple val(sample_id), env(MAPPING_QC), emit: result
+    tuple val(sample_id), env('MAPPING_QC'), emit: result
     tuple val(sample_id), path(mapping_qc_report), emit: report
 
     script:

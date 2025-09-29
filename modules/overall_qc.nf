@@ -9,7 +9,7 @@ process OVERALL_QC {
     tuple val(sample_id), val(file_validity), val(read_qc), val(assembly_qc), val(mapping_qc), val(taxonomy_qc)
 
     output:
-    tuple val(sample_id), env(OVERALL_QC), emit: result
+    tuple val(sample_id), env('OVERALL_QC'), emit: result
     tuple val(sample_id), path(overall_qc_report), emit: report
 
     script:

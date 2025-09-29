@@ -9,7 +9,7 @@ process FILE_VALIDATION {
     tuple val(sample_id), path(reads)
 
     output:
-    tuple val(sample_id), env(FILE_VALIDITY), emit: result
+    tuple val(sample_id), env('FILE_VALIDITY'), emit: result
 
     script:
     read_one="${reads[0]}"
@@ -61,8 +61,8 @@ process READ_QC {
     val(qc_depth)
 
     output:
-    tuple val(sample_id), env(BASES), emit: bases
-    tuple val(sample_id), env(READ_QC), emit: result
+    tuple val(sample_id), env('BASES'), emit: bases
+    tuple val(sample_id), env('READ_QC'), emit: result
     tuple val(sample_id), path(read_qc_report), emit: report
 
     script:

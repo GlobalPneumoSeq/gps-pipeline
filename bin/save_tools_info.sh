@@ -22,4 +22,5 @@ jq -n \
     --argjson kraken2 "$(add_version "$KRAKEN2_VERSION")" \
     --argjson seroba "$(add_version "$SEROBA_VERSION")" \
     --argjson ariba "$(add_version "$ARIBA_VERSION")" \
+    --argjson bakta "$(add_version "$BAKTA_VERSION")" \
     '$ARGS.named' > "$JSON_FILE"

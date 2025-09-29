@@ -57,18 +57,17 @@ process GET_ARIBA_DB {
 
     output:
     path ariba_db, emit: path
-    val output, emit: database
 
     script:
     ariba_db="${db}/ariba"
-    output='database'
     json='done_ariba_db.json'
+    checksum='checksum.md5'
     """
     REF_SEQUENCES="$ref_sequences"
     METADATA="$metadata"
     DB_LOCAL="$ariba_db"
-    OUTPUT="$output"
     JSON_FILE="$json"
+    CHECKSUM_FILE='$checksum'
 
     source check-create_ariba_db.sh
     """
@@ -83,7 +82,6 @@ process OTHER_RESISTANCE {
 
     input:
     path ariba_database
-    val database
     tuple val(sample_id), path(read1), path(read2), path(unpaired)
 
     output:
@@ -92,7 +90,7 @@ process OTHER_RESISTANCE {
     script:
     report_debug='result/debug.report.tsv'
     """
-    ariba run --nucmer_min_id 80 "$ariba_database/$database" "$read1" "$read2" result
+    ariba run --nucmer_min_id 80 "$ariba_database" "$read1" "$read2" result
     """
 }
 

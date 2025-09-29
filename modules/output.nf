@@ -24,12 +24,13 @@ process GENERATE_OVERALL_REPORT {
     label 'python_container'
     label 'farm_low'
 
-    publishDir "${params.output}", mode: "copy"
+    publishDir "${output}", mode: "copy"
 
     input:
     path '*'
     path ariba_metadata
     path resistance_to_mic
+    val output
 
     output:
     path "$overall_report", emit: report
