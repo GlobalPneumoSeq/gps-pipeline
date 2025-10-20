@@ -1,0 +1,25 @@
+{
+    "Should create MLST report": {
+        "content": [
+            {
+                "0": [
+                    [
+                        "test_sample",
+                        "mlst_report.csv:md5,7b88889319a3c5120c347e3a32f1ed12"
+                    ]
+                ],
+                "report": [
+                    [
+                        "test_sample",
+                        "mlst_report.csv:md5,7b88889319a3c5120c347e3a32f1ed12"
+                    ]
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.7"
+        },
+        "timestamp": "2025-10-20T15:06:27.130094209"
+    }
+}
