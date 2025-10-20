@@ -15,3 +15,7 @@ test_input
 
 # Singularity cache
 singularity_cache
+
+# nf-test
+.nf-test
+.nf-test.log
