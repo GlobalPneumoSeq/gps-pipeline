@@ -282,8 +282,8 @@ The pipeline is compatible with [Launchpad](https://docs.seqera.io/platform/late
 ## Lineage
 | Option | Values | Description |
 | --- | ---| --- |
-| `--poppunk_db_remote` | Any valid URL to a PopPUNK database in `.tar.gz` or `.tgz` format<br />(Default: [GPS v9](https://gps-project.cog.sanger.ac.uk/GPS_v9.tar.gz)) | URL to a PopPUNK database. |
-| `--poppunk_ext_remote` | Any valid URL to a PopPUNK external clusters file in `.csv` format<br />(Default: [GPS v9 GPSC Designation](https://gps-project.cog.sanger.ac.uk/GPS_v9_external_clusters.csv)) | URL to a PopPUNK external clusters file. |
+| `--poppunk_db_remote` | Any valid URL to a PopPUNK database in `.tar.gz` or `.tgz` format<br />(Default: [GPS v10](https://gps-project.cog.sanger.ac.uk/GPS_v10.tar.gz)) | URL to a PopPUNK database. |
+| `--poppunk_ext_remote` | Any valid URL to a PopPUNK external clusters file in `.csv` format<br />(Default: [GPS v10 GPSC Designation](https://gps-project.cog.sanger.ac.uk/GPS_v10_external_clusters.csv)) | URL to a PopPUNK external clusters file. |
 
 ## Other AMR
 | Option | Values | Description |
