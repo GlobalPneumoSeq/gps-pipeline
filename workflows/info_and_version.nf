@@ -101,7 +101,7 @@ workflow GET_VERSION {
 
     main:
         IMAGES(
-            Channel.fromList(workflow.container.collect { "${it.key}\t${it.value}" })
+            channel.fromList(workflow.container.collect { it -> "${it.key}\t${it.value}" })
                 .unique()
                 .collectFile(name: 'processesContainersList.tsv', newLine: true)
         )            

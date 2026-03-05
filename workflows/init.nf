@@ -47,7 +47,7 @@ workflow INIT {
     // Pull all Docker images used in the workflow if using Docker
     if (workflow.containerEngine == 'docker') {
         GET_DOCKER_COMPOSE(
-            Channel.fromList(workflow.container.collect { it.value })
+            channel.fromList(workflow.container.collect { it -> it.value })
                 .unique()
                 .collectFile(name: 'containersList.txt', newLine: true)
         )
