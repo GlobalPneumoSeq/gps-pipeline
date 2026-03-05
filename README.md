@@ -63,7 +63,7 @@ If you have used the GPS Pipeline in your research, please cite us in your relev
 ### Software
 - A POSIX-compatible operating system (e.g. Linux, macOS, Windows with [WSL](https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux)) with Bash 3.2 or later
     - [Installation guide for WSL on Windows](https://learn.microsoft.com/en-us/windows/wsl/install) by Microsoft
-- Java 17 or later (up to 24) ([OpenJDK](https://openjdk.org/)/[Oracle Java](https://www.oracle.com/java/))
+- Java 17 or later (up to 25) ([OpenJDK](https://openjdk.org/)/[Oracle Java](https://www.oracle.com/java/))
     - [Installation guide for OpenJDK](https://www.freecodecamp.org/news/install-openjdk-free-java-multi-os-guide/) by freeCodeCamp
 - [Docker](https://www.docker.com/) or [Singularity](https://sylabs.io/singularity/)/[Apptainer](https://apptainer.org/)
     - Installation guides:
