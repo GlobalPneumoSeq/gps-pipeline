@@ -40,8 +40,6 @@ workflow PIPELINE {
     spneumo_percentage
     non_strep_percentage
     resistance_to_mic
-    output
-    file_publish
 
     main:
     // Get path and prefix of Reference Genome BWA Database, generate from assembly if necessary
@@ -91,11 +89,11 @@ workflow PIPELINE {
                         .map { it -> it[0, 2..-1] }
 
     // From Channel READ_QC_PASSED_READS_ch, assemble the preprocess read pairs
-    // Output into Channel ASSEMBLY_ch, and hardlink (default) the assemblies to output directory
+    // Output into Channel ASSEMBLY_ch
     if (assembler == 'shovill') {
-        ASSEMBLY_ch = ASSEMBLY_SHOVILL(READ_QC_PASSED_READS_ch, min_contig_length, assembler_thread, output, file_publish)
+        ASSEMBLY_ch = ASSEMBLY_SHOVILL(READ_QC_PASSED_READS_ch, min_contig_length, assembler_thread)
     } else if (assembler == 'unicycler') {
-        ASSEMBLY_ch = ASSEMBLY_UNICYCLER(READ_QC_PASSED_READS_ch, min_contig_length, assembler_thread, output, file_publish)
+        ASSEMBLY_ch = ASSEMBLY_UNICYCLER(READ_QC_PASSED_READS_ch, min_contig_length, assembler_thread)
     } else {
         log.error("Invalid assembler was selected.") 
         System.exit(1)
@@ -168,9 +166,8 @@ workflow PIPELINE {
                             .map { it -> it[0, 2..-1] }
 
     // From Channel OVERALL_QC_PASSED_ASSEMBLIES_ch, annotate samples passed overall QC
-    // Hardlink (default) the annotations to output directory
     if (annotation) {
-        ANNOTATE(GET_BAKTA_DB.out.path, OVERALL_QC_PASSED_ASSEMBLIES_ch, output, file_publish)
+        ANNOTATE(GET_BAKTA_DB.out.path, OVERALL_QC_PASSED_ASSEMBLIES_ch)
     }
 
     // From Channel OVERALL_QC_PASSED_ASSEMBLIES_ch, generate PopPUNK query file containing assemblies of samples passed overall QC
@@ -217,7 +214,7 @@ workflow PIPELINE {
     )
 
     // Generate overall report based on sample reports, ARIBA metadata, resistance to MIC lookup table
-    GENERATE_OVERALL_REPORT(GENERATE_SAMPLE_REPORT.out.report.collect(), ariba_metadata, resistance_to_mic, output)
+    GENERATE_OVERALL_REPORT(GENERATE_SAMPLE_REPORT.out.report.collect(), ariba_metadata, resistance_to_mic)
 
     // Pass databases information to SAVE_INFO sub-workflow
     DATABASES_INFO = GET_REF_GENOME_BWA_DB.out.path.map { it -> [["bwa_db_path", it]] }
@@ -231,5 +228,8 @@ workflow PIPELINE {
                         .map { it -> it.collectEntries() }
 
     emit:
-    databases_info = DATABASES_INFO
+    overall_report  = GENERATE_OVERALL_REPORT.out.report
+    databases_info  = DATABASES_INFO
+    assemblies      = ASSEMBLY_ch
+    annotations     = annotation ? ANNOTATE.out : channel.empty()
 }

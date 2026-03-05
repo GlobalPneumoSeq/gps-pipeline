@@ -8,12 +8,10 @@ class Validate {
             version: 'boolean',
             annotation: 'boolean',
             reads: 'path_exist',
-            output: 'path',
             db: 'path',
             assembler: 'assembler',
             min_contig_length: 'int',
             assembler_thread: 'int',
-            file_publish: 'publish_mode',
             seroba_db_remote: 'url_targz',
             seroba_kmer: 'int',
             kraken2_db_remote: 'url_targz',
@@ -55,11 +53,11 @@ class Validate {
             validParams.put("singularity_cachedir", "path")
         }
 
-        // For initalisation, skip input and output directories checks
+        // For initalisation, skip input directory check
         // For version, skip all file paths related checks
         def skippedParams = []
         if (params.init) {
-            skippedParams = ['reads', 'output']
+            skippedParams = ['reads']
         } else if (params.version) {
             validParams.each {
                 key, value ->
@@ -104,12 +102,6 @@ class Validate {
                 case 'int_float':
                     if (value !instanceof Integer && value !instanceof BigDecimal && value !instanceof Double) {
                         invalidValues[key] = [value, 'integer or float value']
-                    }
-                    break
-
-                case 'publish_mode':
-                    if (!['link', 'symlink', 'copy'].contains(value)) {
-                        invalidValues[key] = [value, 'Nextflow publish mode']
                     }
                     break
 

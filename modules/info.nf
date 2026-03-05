@@ -300,12 +300,10 @@ process PRINT {
     )
 }
 
-// Save core software, I/O, assembler, QC parameters, databases, tools, container engine and images information to info.txt at output dir
+// Save core software, I/O, assembler, QC parameters, databases, tools, container engine and images information to info.txt
 process SAVE {
     label 'farm_local'
     
-    publishDir "${output}", mode: "copy"
-
     input:
     tuple val(coreText), val(dbText), val(toolText), val(imageText), val(nprocValue)
     val reads

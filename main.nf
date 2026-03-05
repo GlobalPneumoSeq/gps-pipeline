@@ -8,6 +8,7 @@ include { PRINT_VERSION; SAVE_INFO } from './workflows/info_and_version'
 
 
 workflow {
+    main:
     // Start message
     Messages.startMessage(workflow.manifest.version, log)
 
@@ -24,7 +25,7 @@ workflow {
     if (params.help) {
         Messages.helpMessage(log)
     } else if (params.init) {
-        Messages.workflowSelectMessage('init', params, log)
+        Messages.workflowSelectMessage('init', params.reads, workflow.outputDir.toString(), log)
         INIT(
             params.annotation,
             params.db,
@@ -39,7 +40,7 @@ workflow {
             params.bakta_db_remote
         )
     } else if (params.version) {
-        Messages.workflowSelectMessage('version', params, log)
+        Messages.workflowSelectMessage('version', params.reads, workflow.outputDir.toString(), log)
         PRINT_VERSION(
             params.resistance_to_mic, 
             workflow.manifest.version,
@@ -47,7 +48,7 @@ workflow {
             params.assembler
         )
     } else {
-        Messages.workflowSelectMessage('pipeline', params, log)
+        Messages.workflowSelectMessage('pipeline', params.reads, workflow.outputDir.toString(), log)
         PIPELINE(
             params.annotation,
             params.lite,
@@ -74,9 +75,7 @@ workflow {
             params.kraken2_memory_mapping,
             params.spneumo_percentage,
             params.non_strep_percentage,
-            params.resistance_to_mic,
-            params.output,
-            params.file_publish
+            params.resistance_to_mic
         )
         SAVE_INFO(
             PIPELINE.out.databases_info, 
@@ -86,7 +85,7 @@ workflow {
             params.assembler_thread,
             params.min_contig_length,
             params.reads,
-            params.output,
+            workflow.outputDir.toString(),
             params.contigs,
             params.length_low,
             params.length_high,
@@ -103,12 +102,30 @@ workflow {
         if (params.help) {
             return
         } else if (params.init) {
-            Messages.endMessage('init', params, workflow, log)
+            Messages.endMessage('init', workflow.outputDir.toString(), workflow, log)
         } else if (params.version) {
-            Messages.endMessage('version', params, workflow, log)
+            Messages.endMessage('version', workflow.outputDir.toString(), workflow, log)
         } else {
-            Messages.endMessage('pipeline', params, workflow, log)
+            Messages.endMessage('pipeline', workflow.outputDir.toString(), workflow, log)
         }
     }
+
+    publish:
+    overall_report  = (params.init || params.help || params.version) ? channel.empty() : PIPELINE.out.overall_report
+    info            = (params.init || params.help || params.version) ? channel.empty() : SAVE_INFO.out.info
+    assemblies      = (params.init || params.help || params.version) ? channel.empty() : PIPELINE.out.assemblies
+    annotations     = (params.init || params.help || params.version) ? channel.empty() : PIPELINE.out.annotations
 }
 
+output {
+    overall_report {
+    }
+    info {
+    }
+    assemblies {
+        path 'assemblies'
+    }
+    annotations {
+        path 'annotations'
+    }
+}

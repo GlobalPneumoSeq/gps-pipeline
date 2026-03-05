@@ -29,7 +29,7 @@ workflow PRINT_VERSION {
         PRINT(PARSE.out.text)
 }
 
-// Sub-workflow of PIPELINE workflow the save versions of pipeline and tools, and QC parameters to info.txt at output dir
+// Sub-workflow of PIPELINE workflow the save versions of pipeline and tools, and QC parameters to info.txt
 workflow SAVE_INFO {
     take:
         databases_info
@@ -84,6 +84,9 @@ workflow SAVE_INFO {
             ref_coverage,
             het_snp_site
         )
+    
+    emit:
+    info = SAVE.out.info
 }
 
 // Sub-workflow for generating a json that contains versions of pipeline and tools
