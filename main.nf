@@ -101,12 +101,8 @@ workflow {
     workflow.onComplete = {
         if (params.help) {
             return
-        } else if (params.init) {
-            Messages.endMessage('init', workflow.outputDir.toString(), workflow, log)
-        } else if (params.version) {
-            Messages.endMessage('version', workflow.outputDir.toString(), workflow, log)
         } else {
-            Messages.endMessage('pipeline', workflow.outputDir.toString(), workflow, log)
+            Messages.endMessage(params.init ? 'init' : (params.version ? 'version' : 'pipeline'), workflow.outputDir.toString(), workflow, log)
         }
     }
 
