@@ -8,6 +8,8 @@ class Validate {
             version: 'boolean',
             annotation: 'boolean',
             reads: 'path_exist',
+            output: 'path',
+            file_publish: 'publish_mode',
             db: 'path',
             assembler: 'assembler',
             min_contig_length: 'int',
@@ -53,11 +55,11 @@ class Validate {
             validParams.put("singularity_cachedir", "path")
         }
 
-        // For initalisation, skip input directory check
+        // For initalisation, skip input and output directories checks
         // For version, skip all file paths related checks
         def skippedParams = []
         if (params.init) {
-            skippedParams = ['reads']
+            skippedParams = ['reads', 'output']
         } else if (params.version) {
             validParams.each {
                 key, value ->
@@ -102,6 +104,12 @@ class Validate {
                 case 'int_float':
                     if (value !instanceof Integer && value !instanceof BigDecimal && value !instanceof Double) {
                         invalidValues[key] = [value, 'integer or float value']
+                    }
+                    break
+ 
+                case 'publish_mode':
+                    if (!['link', 'symlink', 'copy'].contains(value)) {
+                        invalidValues[key] = [value, 'Nextflow publish mode']
                     }
                     break
 
