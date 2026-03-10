@@ -26,7 +26,7 @@ workflow INIT {
     // Check Reference Genome BWA Database, generate from assembly if necessary
     GET_REF_GENOME_BWA_DB(ref_genome, db)
 
-    // Check ARIBA database, generate from reference sequences and metadata if ncessary
+    // Check ARIBA database, generate from reference sequences and metadata if necessary
     GET_ARIBA_DB(ariba_ref, ariba_metadata, db)
 
     // Check Kraken2 Database, download if necessary

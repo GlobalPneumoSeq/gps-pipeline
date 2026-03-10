@@ -194,9 +194,9 @@ process PARSE {
         |╠═══════════════╧═════════════════════════════════════════════════════════════════════════════════╣
         |║ PopPUNK database                                                                                ║
         |╟───────────────┬─────────────────────────────────────────────────────────────────────────────────╢
-        |${Texts.dbTextRow('Source', json.poppunnk_db.url)}
-        |${Texts.dbTextRow('Saved', json.poppunnk_db.save_time)}
-        |${Texts.dbTextRow('Version', json.poppunnk_db.db_version)}
+        |${Texts.dbTextRow('Source', json.poppunk_db.url)}
+        |${Texts.dbTextRow('Saved', json.poppunk_db.save_time)}
+        |${Texts.dbTextRow('Version', json.poppunk_db.db_version)}
         |╠═══════════════╧═════════════════════════════════════════════════════════════════════════════════╣
         |║ PopPUNK external clusters file                                                                  ║
         |╟───────────────┬─────────────────────────────────────────────────────────────────────────────────╢

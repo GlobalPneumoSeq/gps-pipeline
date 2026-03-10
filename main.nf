@@ -23,7 +23,7 @@ workflow {
 
     // If Singularity is used as the container engine and not showing help message, do preflight check to prevent parallel pull issues
     // Related issue: https://github.com/nextflow-io/nextflow/issues/1210
-    if (workflow.containerEngine == 'singularity' & selectedWorkflow != 'help') {
+    if (workflow.containerEngine == 'singularity' && selectedWorkflow != 'help') {
         Singularity.singularityPreflight(workflow.container, params.singularity_cachedir, log)
     }
 
@@ -110,7 +110,7 @@ workflow {
         Messages.endMessage(selectedWorkflow, workflow.outputDir.toString(), workflow, log)
     }
 
-    // Publish empty channels if pipline workflow is not selected
+    // Publish empty channels if pipeline workflow is not selected
     publish:
     overall_report  = selectedWorkflow != 'pipeline' ? channel.empty() : PIPELINE.out.overall_report
     info            = selectedWorkflow != 'pipeline' ? channel.empty() : SAVE_INFO.out.info

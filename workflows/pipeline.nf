@@ -55,7 +55,7 @@ workflow PIPELINE {
     GET_POPPUNK_DB(poppunk_db_remote, db)
     GET_POPPUNK_EXT_CLUSTERS(poppunk_ext_remote, db)
 
-    // Get path to ARIBA database, generate from reference sequences and metadata if ncessary
+    // Get path to ARIBA database, generate from reference sequences and metadata if necessary
     GET_ARIBA_DB(ariba_ref, ariba_metadata, db)
 
     // Get path fo Bakta database, download if necessary

@@ -55,7 +55,7 @@ class Validate {
             validParams.put("singularity_cachedir", "path")
         }
 
-        // For initalisation, skip input and output directories checks
+        // For initialisation, skip input and output directories checks
         // For version, skip all file paths related checks
         def skippedParams = []
         if (params.init) {
