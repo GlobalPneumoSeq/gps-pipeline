@@ -33,6 +33,7 @@ process DATABASES {
     path poppunk_ext_path
     path bakta_db_path
     path resistance_to_mic
+    val mlst_last_update
 
     output:
     path(json), emit: json
@@ -62,6 +63,7 @@ process DATABASES {
     BAKTA_DB_PATH="$bakta_db_path"
     BAKTA_JSON="$bakta_json"
     RESISTANCE_TO_MIC="$resistance_to_mic"
+    MLST_LAST_UPDATE="$mlst_last_update"
     JSON_FILE="$json"
 
     source save_databases_info.sh
@@ -221,6 +223,10 @@ process PARSE {
         |╟───────────────┬─────────────────────────────────────────────────────────────────────────────────╢
         |${Texts.dbTextRow('Table', json.resistance_to_mic.table)}
         |${Texts.dbTextRow('Table MD5', json.resistance_to_mic.table_md5)}
+        |╠═══════════════╧═════════════════════════════════════════════════════════════════════════════════╣
+        |║ MLST database                                                                                   ║
+        |╟───────────────┬─────────────────────────────────────────────────────────────────────────────────╢
+        |${Texts.dbTextRow('Last updated', json.mlst_db.last_update)}
         |╠═══════════════╧═════════════════════════════════════════════════════════════════════════════════╣
         |║ Bakta database                                                                                  ║
         |╟───────────────┬─────────────────────────────────────────────────────────────────────────────────╢
@@ -529,6 +535,19 @@ process MLST_VERSION {
     script:
     '''
     VERSION=$(mlst -v | sed -r "s/.*[[:space:]]//")
+    '''
+}
+
+process MLST_LAST_UPDATE {
+    label 'mlst_container'
+    label 'farm_low'
+
+    output:
+    env 'LAST_UPDATE'
+
+    script:
+    '''
+    LAST_UPDATE=$(mlst --info | grep spneumoniae | cut -f 5)
     '''
 }
 
