@@ -26,7 +26,7 @@ workflow INIT {
     // Check Reference Genome BWA Database, generate from assembly if necessary
     GET_REF_GENOME_BWA_DB(ref_genome, db)
 
-    // Check ARIBA database, generate from reference sequences and metadata if ncessary
+    // Check ARIBA database, generate from reference sequences and metadata if necessary
     GET_ARIBA_DB(ariba_ref, ariba_metadata, db)
 
     // Check Kraken2 Database, download if necessary
@@ -47,7 +47,7 @@ workflow INIT {
     // Pull all Docker images used in the workflow if using Docker
     if (workflow.containerEngine == 'docker') {
         GET_DOCKER_COMPOSE(
-            Channel.fromList(workflow.container.collect { it.value })
+            channel.fromList(workflow.container.collect { it -> it.value })
                 .unique()
                 .collectFile(name: 'containersList.txt', newLine: true)
         )

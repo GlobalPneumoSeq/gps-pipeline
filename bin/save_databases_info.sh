@@ -83,7 +83,7 @@ jq -n \
     --argjson ariba_db "$(add_ariba_db)" \
     --argjson seroba_db "$(add_seroba_db)" \
     --argjson kraken2_db "$(add_url_db "${KRAKEN2_DB_PATH}/${KRAKEN2_JSON}")" \
-    --argjson poppunnk_db "$(add_url_db_versioned "${POPPUNK_DB_PATH}/${POPPUNK_JSON}")" \
+    --argjson poppunk_db "$(add_url_db_versioned "${POPPUNK_DB_PATH}/${POPPUNK_JSON}")" \
     --argjson poppunk_ext "$(add_url_db "${POPPUNK_EXT_PATH}/${POPPUNK_EXT_JSON}")" \
     --argjson bakta_db "$(add_url_db_versioned "${BAKTA_DB_PATH}/${BAKTA_JSON}")" \
     --argjson resistance_to_mic "$(add_resistance_to_mic)"\

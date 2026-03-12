@@ -1,19 +1,15 @@
 // Run Unicycler to get assembly
-// Return sample_id and assembly, and publish the assembly to ${output}/assemblies directory based on ${file_publish}
+// Return sample_id and assembly
 process ASSEMBLY_UNICYCLER {
     label 'unicycler_container'
     label 'farm_high'
 
     tag "$sample_id"
 
-    publishDir "${output}/assemblies", mode: "${file_publish}"
-
     input:
     tuple val(sample_id), path(read1), path(read2), path(unpaired)
     val min_contig_length
     val assembler_thread
-    val output
-    val file_publish
 
     output:
     tuple val(sample_id), path(fasta)
@@ -34,21 +30,17 @@ process ASSEMBLY_UNICYCLER {
 }
 
 // Run Shovill to get assembly
-// Return sample_id and assembly, and publish the assembly to ${output}/assemblies directory based on ${file_publish}
+// Return sample_id and assembly
 process ASSEMBLY_SHOVILL {
     label 'shovill_container'
     label 'farm_high'
 
     tag "$sample_id"
 
-    publishDir "${output}/assemblies", mode: "${file_publish}"
-
     input:
     tuple val(sample_id), path(read1), path(read2), path(unpaired)
     val min_contig_length
     val assembler_thread
-    val output
-    val file_publish
 
     output:
     tuple val(sample_id), path(fasta)
@@ -76,6 +68,7 @@ process ASSEMBLY_ASSESS {
 
     input:
     tuple val(sample_id), path(assembly)
+    
     output:
     tuple val(sample_id), path('results/report.tsv'), emit: report
 

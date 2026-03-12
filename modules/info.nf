@@ -194,9 +194,9 @@ process PARSE {
         |╠═══════════════╧═════════════════════════════════════════════════════════════════════════════════╣
         |║ PopPUNK database                                                                                ║
         |╟───────────────┬─────────────────────────────────────────────────────────────────────────────────╢
-        |${Texts.dbTextRow('Source', json.poppunnk_db.url)}
-        |${Texts.dbTextRow('Saved', json.poppunnk_db.save_time)}
-        |${Texts.dbTextRow('Version', json.poppunnk_db.db_version)}
+        |${Texts.dbTextRow('Source', json.poppunk_db.url)}
+        |${Texts.dbTextRow('Saved', json.poppunk_db.save_time)}
+        |${Texts.dbTextRow('Version', json.poppunk_db.db_version)}
         |╠═══════════════╧═════════════════════════════════════════════════════════════════════════════════╣
         |║ PopPUNK external clusters file                                                                  ║
         |╟───────────────┬─────────────────────────────────────────────────────────────────────────────────╢
@@ -300,12 +300,10 @@ process PRINT {
     )
 }
 
-// Save core software, I/O, assembler, QC parameters, databases, tools, container engine and images information to info.txt at output dir
+// Save core software, I/O, assembler, QC parameters, databases, tools, container engine and images information to info.txt
 process SAVE {
     label 'farm_local'
     
-    publishDir "${output}", mode: "copy"
-
     input:
     tuple val(coreText), val(dbText), val(toolText), val(imageText), val(nprocValue)
     val reads
