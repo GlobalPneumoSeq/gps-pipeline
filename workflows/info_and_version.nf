@@ -1,4 +1,4 @@
-include { IMAGES; DATABASES; TOOLS; COMBINE_INFO; PARSE; PRINT; SAVE; PYTHON_VERSION; FASTP_VERSION; UNICYCLER_VERSION; SHOVILL_VERSION; QUAST_VERSION; BWA_VERSION; SAMTOOLS_VERSION; BCFTOOLS_VERSION; POPPUNK_VERSION; MLST_VERSION; KRAKEN2_VERSION; SEROBA_VERSION; ARIBA_VERSION; BAKTA_VERSION} from '../modules/info'
+include { IMAGES; DATABASES; TOOLS; COMBINE_INFO; PARSE; PRINT; SAVE; PYTHON_VERSION; FASTP_VERSION; UNICYCLER_VERSION; SHOVILL_VERSION; QUAST_VERSION; BWA_VERSION; SAMTOOLS_VERSION; BCFTOOLS_VERSION; POPPUNK_VERSION; MLST_VERSION; MLST_LAST_UPDATE; KRAKEN2_VERSION; SEROBA_VERSION; ARIBA_VERSION; BAKTA_VERSION} from '../modules/info'
 
 // Alternative workflow that prints versions of pipeline and tools
 workflow PRINT_VERSION {
@@ -109,6 +109,8 @@ workflow GET_VERSION {
                 .collectFile(name: 'processesContainersList.tsv', newLine: true)
         )            
 
+        MLST_LAST_UPDATE()
+
         DATABASES(
             bwa_db_path,
             ariba_db_path,
@@ -117,7 +119,8 @@ workflow GET_VERSION {
             poppunk_db_path,
             poppunk_ext_path,
             bakta_db_path,
-            resistance_to_mic
+            resistance_to_mic,
+            MLST_LAST_UPDATE.out
         )
 
         nextflow_version = "$nextflow.version"

@@ -78,6 +78,10 @@ add_resistance_to_mic () {
     jq -n --arg table "$TABLE" --arg table_md5 "$TABLE_MD5" '. = {"table": $table, "table_md5": $table_md5}'
 }
 
+add_mlst_last_update () {
+    jq -n --arg last_update "$MLST_LAST_UPDATE" '. = {"last_update": $last_update}'
+}
+
 jq -n \
     --argjson bwa_db "$(add_bwa_db)" \
     --argjson ariba_db "$(add_ariba_db)" \
@@ -87,4 +91,5 @@ jq -n \
     --argjson poppunk_ext "$(add_url_db "${POPPUNK_EXT_PATH}/${POPPUNK_EXT_JSON}")" \
     --argjson bakta_db "$(add_url_db_versioned "${BAKTA_DB_PATH}/${BAKTA_JSON}")" \
     --argjson resistance_to_mic "$(add_resistance_to_mic)"\
+    --argjson mlst_db "$(add_mlst_last_update)"\
     '$ARGS.named' > "$JSON_FILE"
