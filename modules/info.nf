@@ -77,6 +77,7 @@ process TOOLS {
 
     input:
     val python_version
+    val pandas_version
     val fastp_version
     tuple  val(unicycler_version), val(unicycler_nproc_value)
     tuple  val(shovill_version), val(shovill_nproc_value)
@@ -98,6 +99,7 @@ process TOOLS {
     json='tools.json'
     """
     PYTHON_VERSION="$python_version"
+    PANDAS_VERSION="$pandas_version"
     FASTP_VERSION="$fastp_version"
     UNICYCLER_VERSION="$unicycler_version"
     UNICYCLER_NPROC_VALUE="$unicycler_nproc_value"
@@ -242,6 +244,7 @@ process PARSE {
         |${Texts.textRow(30, 62, 'Tool', 'Version')}
         |╠════════════════════════════════╪════════════════════════════════════════════════════════════════╣
         |${Texts.toolTextRow(json, 'Python', 'python')}
+        |${Texts.toolTextRow(json, 'pandas', 'pandas')}
         |${Texts.toolTextRow(json, 'fastp', 'fastp')}
         |${Texts.toolTextRow(json, 'Unicycler', 'unicycler')}
         |${Texts.toolTextRow(json, 'Shovill', 'shovill')}
@@ -265,7 +268,7 @@ process PARSE {
         |${Texts.textRow(30, 62, 'Environment For', 'Image')}
         |╠════════════════════════════════╪════════════════════════════════════════════════════════════════╣
         |${Texts.imageTextRow(json, 'Bash', 'bash')}
-        |${Texts.imageTextRow(json, 'Python', 'python')}
+        |${Texts.imageTextRow(json, 'Python / pandas', 'python')}
         |${Texts.imageTextRow(json, 'fastp', 'fastp')}
         |${Texts.imageTextRow(json, 'Unicycler', 'unicycler')}
         |${Texts.imageTextRow(json, 'Shovill', 'shovill')}
@@ -406,16 +409,18 @@ process SAVE {
 
 // Below processes get tool versions within container images by running their containers
 
-process PYTHON_VERSION {
+process PYTHON_PANDAS_VERSION {
     label 'python_container'
     label 'farm_low'
 
     output:
-    env 'VERSION'
+    env 'PYTHON_VERSION', emit: python_version
+    env 'PANDAS_VERSION', emit: pandas_version
 
     script:
     '''
-    VERSION=$(python3 --version | sed -r "s/^.*[[:space:]]//")
+    PYTHON_VERSION=$(python3 --version | sed -r "s/^.*[[:space:]]//")
+    PANDAS_VERSION=$(python3 -c "import pandas as pd; print(pd.__version__)")
     '''
 }
 
