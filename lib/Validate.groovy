@@ -55,21 +55,12 @@ class Validate {
             validParams.put("singularity_cachedir", "path")
         }
 
-        // For initialisation, skip input and output directories checks
-        // For version, skip all file paths related checks
-        def skippedParams = []
-        if (params.init) {
-            skippedParams = ['reads', 'output']
-        } else if (params.version) {
-            validParams.each {
-                key, value ->
-                if (['path', 'path_exist', 'path_fasta'].contains(value)) {
-                    skippedParams.add(key)
-                }
-            }
+        // For initialisation and version, skip input and output directories checks
+        if (params.init || params.version) {
+            def skippedParams = ['reads', 'output']
+            skippedParams.each { key -> validParams[key] = 'skip' }
         }
-        skippedParams.each { key -> validParams[key] = 'skip' }
-
+        
         // To save invalid parameters in this list
         def invalidParams = []
         // To save invalid parameter values as "parameter : [value, issue]" in this map
