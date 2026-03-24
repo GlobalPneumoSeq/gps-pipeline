@@ -352,7 +352,7 @@ process SAVE {
     |${Texts.assemblerTextRow('Option', 'Value')}
     |╠═══════════════════════════╪═════════════════════════════════════════════════════════════════════╣
     |${Texts.assemblerTextRow('Assembler', assembler.capitalize())}
-    |${Texts.assemblerTextRow('Assembler Thread', assembler_thread == 0 ? "${nprocValue} (All Available)" : assembler_thread)}
+    |${Texts.assemblerTextRow('Assembler Thread', assembler_thread == 0 ? "${Math.min(nprocValue as Integer, 16)} (Auto)" : assembler_thread)}
     |${Texts.assemblerTextRow('Minimum contig length', min_contig_length)}
     |╚═══════════════════════════╧═════════════════════════════════════════════════════════════════════╝
     |""".stripMargin()

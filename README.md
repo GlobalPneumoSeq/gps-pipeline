@@ -250,7 +250,7 @@ The pipeline is compatible with [Launchpad](https://docs.seqera.io/platform/late
 | Option | Values | Description |
 | --- | ---| --- |
 | `--assembler` | `"shovill"` or `"unicycler"`<br />(Default: `"shovill"`)| Using which SPAdes-based assembler to assemble the reads. |
-| `--assembler_thread` | Any integer value<br />(Default: `0`) | Number of threads used by the assembler. `0` means all available. |
+| `--assembler_thread` | Any integer value<br />(Default: `0`) | Number of threads used by the assembler. `0` enables auto-detection of available cores (up to a maximum of `16`). |
 | `--min_contig_length` | Any integer value<br />(Default: `500`) | Minimum legnth of contig to be included in the assembly. |
 
 ## Mapping
