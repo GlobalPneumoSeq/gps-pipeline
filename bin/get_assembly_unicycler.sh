@@ -1,8 +1,10 @@
 # Run Unicycler to get assembly
-# Set to use all available threads if not specify; not using unpaired read if it is empty to prevent Unicycler from crashing
+# Set to use all available threads up to 16 if not specify; not using unpaired read if it is empty to prevent Unicycler from crashing
 
 if [ "$THREAD" = '0' ]; then 
     THREAD=$(nproc)
+    CAP="16"
+    [ "$THREAD" -gt "$CAP" ] && THREAD="$CAP"
 fi
 
 if [ -s "$UNPAIRED" ]; then 
