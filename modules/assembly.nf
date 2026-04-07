@@ -2,7 +2,7 @@
 // Return sample_id and assembly
 process ASSEMBLY_UNICYCLER {
     label 'unicycler_container'
-    label 'farm_high'
+    label 'farm_assembler'
 
     tag "$sample_id"
 
@@ -33,7 +33,7 @@ process ASSEMBLY_UNICYCLER {
 // Return sample_id and assembly
 process ASSEMBLY_SHOVILL {
     label 'shovill_container'
-    label 'farm_high'
+    label 'farm_assembler'
 
     tag "$sample_id"
 
