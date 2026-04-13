@@ -72,9 +72,9 @@ If you have used the GPS Pipeline in your research, please cite us in your relev
 It is recommended to have at least 16GB of RAM and 100GB of free storage
 > [!NOTE] 
 > - The pipeline core files use ~6MB
-> - All default databases use ~20GB in total (the optional Bakta database for annotation use an additional ~4GB)
-> - All Docker images use ~14GB in total; alternatively, Singularity images use ~4.7GB in total
-> - The pipeline generates ~1.8GB intermediate files for each sample on average
+> - All default databases use ~13GB in total (the optional Bakta database for annotation use an additional ~4GB)
+> - All Docker images use ~16GB in total; alternatively, Singularity images use ~5.5GB in total
+> - The pipeline generates ~2GB intermediate files for each sample on average
 >     - These files can be removed when the pipeline run is completed, please refer to [Clean Up](#clean-up)
 >     - To further reduce storage requirement by sacrificing the ability to resume the pipeline, please refer to [Experimental](#experimental)
 ## Accepted Inputs
