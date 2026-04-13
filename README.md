@@ -72,9 +72,9 @@ If you have used the GPS Pipeline in your research, please cite us in your relev
 It is recommended to have at least 16GB of RAM and 100GB of free storage
 > [!NOTE] 
 > - The pipeline core files use ~6MB
-> - All default databases use ~20GB in total (the optional Bakta database for annotation use an additional ~4GB)
-> - All Docker images use ~14GB in total; alternatively, Singularity images use ~4.7GB in total
-> - The pipeline generates ~1.8GB intermediate files for each sample on average
+> - All default databases use ~13GB in total (the optional Bakta database for annotation use an additional ~4GB)
+> - All Docker images use ~16GB in total; alternatively, Singularity images use ~5.5GB in total
+> - The pipeline generates ~2GB intermediate files for each sample on average
 >     - These files can be removed when the pipeline run is completed, please refer to [Clean Up](#clean-up)
 >     - To further reduce storage requirement by sacrificing the ability to resume the pipeline, please refer to [Experimental](#experimental)
 ## Accepted Inputs
@@ -267,14 +267,14 @@ The pipeline is compatible with [Launchpad](https://docs.seqera.io/platform/late
 ## Serotype
 | Option | Values | Description |
 | --- | ---| --- |
-| `--seroba_db_remote` | Any valid URL to a SeroBA release in `.tar.gz` or `.tgz` format<br />(Default: [SeroBA v2.0.5](https://github.com/GlobalPneumoSeq/seroba/archive/refs/tags/v2.0.5.tar.gz))| URL to a SeroBA release. |
+| `--seroba_db_remote` | Any valid URL to a SeroBA release in `.tar.gz` or `.tgz` format<br />(Default: [SeroBA v2.0.6](https://github.com/GlobalPneumoSeq/seroba/archive/refs/tags/v2.0.6.tar.gz))| URL to a SeroBA release. |
 | `--seroba_kmer` | Any integer value<br />(Default: `71`) | Kmer size for creating the KMC database of SeroBA. |
 
 ## Lineage
 | Option | Values | Description |
 | --- | ---| --- |
-| `--poppunk_db_remote` | Any valid URL to a PopPUNK database in `.tar.gz` or `.tgz` format<br />(Default: [GPS v10](https://gps-project.cog.sanger.ac.uk/GPS_v10.tar.gz)) | URL to a PopPUNK database. |
-| `--poppunk_ext_remote` | Any valid URL to a PopPUNK external clusters file in `.csv` format<br />(Default: [GPS v10 GPSC Designation](https://gps-project.cog.sanger.ac.uk/GPS_v10_external_clusters.csv)) | URL to a PopPUNK external clusters file. |
+| `--poppunk_db_remote` | Any valid URL to a PopPUNK database in `.tar.gz` or `.tgz` format<br />(Default: [GPS v11](https://gps-project.cog.sanger.ac.uk/GPS_v11.tar.gz)) | URL to a PopPUNK database. |
+| `--poppunk_ext_remote` | Any valid URL to a PopPUNK external clusters file in `.csv` format<br />(Default: [GPS v11 GPSC Designation](https://gps-project.cog.sanger.ac.uk/GPS_v11_external_clusters.csv)) | URL to a PopPUNK external clusters file. |
 
 ## Other AMR
 | Option | Values | Description |
