@@ -33,6 +33,7 @@ process DATABASES {
     path poppunk_ext_path
     path bakta_db_path
     path resistance_to_mic
+    val mlst_last_update
 
     output:
     path(json), emit: json
@@ -62,6 +63,7 @@ process DATABASES {
     BAKTA_DB_PATH="$bakta_db_path"
     BAKTA_JSON="$bakta_json"
     RESISTANCE_TO_MIC="$resistance_to_mic"
+    MLST_LAST_UPDATE="$mlst_last_update"
     JSON_FILE="$json"
 
     source save_databases_info.sh
@@ -75,6 +77,7 @@ process TOOLS {
 
     input:
     val python_version
+    val pandas_version
     val fastp_version
     tuple  val(unicycler_version), val(unicycler_nproc_value)
     tuple  val(shovill_version), val(shovill_nproc_value)
@@ -96,6 +99,7 @@ process TOOLS {
     json='tools.json'
     """
     PYTHON_VERSION="$python_version"
+    PANDAS_VERSION="$pandas_version"
     FASTP_VERSION="$fastp_version"
     UNICYCLER_VERSION="$unicycler_version"
     UNICYCLER_NPROC_VALUE="$unicycler_nproc_value"
@@ -194,9 +198,9 @@ process PARSE {
         |╠═══════════════╧═════════════════════════════════════════════════════════════════════════════════╣
         |║ PopPUNK database                                                                                ║
         |╟───────────────┬─────────────────────────────────────────────────────────────────────────────────╢
-        |${Texts.dbTextRow('Source', json.poppunnk_db.url)}
-        |${Texts.dbTextRow('Saved', json.poppunnk_db.save_time)}
-        |${Texts.dbTextRow('Version', json.poppunnk_db.db_version)}
+        |${Texts.dbTextRow('Source', json.poppunk_db.url)}
+        |${Texts.dbTextRow('Saved', json.poppunk_db.save_time)}
+        |${Texts.dbTextRow('Version', json.poppunk_db.db_version)}
         |╠═══════════════╧═════════════════════════════════════════════════════════════════════════════════╣
         |║ PopPUNK external clusters file                                                                  ║
         |╟───────────────┬─────────────────────────────────────────────────────────────────────────────────╢
@@ -222,6 +226,10 @@ process PARSE {
         |${Texts.dbTextRow('Table', json.resistance_to_mic.table)}
         |${Texts.dbTextRow('Table MD5', json.resistance_to_mic.table_md5)}
         |╠═══════════════╧═════════════════════════════════════════════════════════════════════════════════╣
+        |║ MLST database                                                                                   ║
+        |╟───────────────┬─────────────────────────────────────────────────────────────────────────────────╢
+        |${Texts.dbTextRow('Last updated', json.mlst_db.last_update)}
+        |╠═══════════════╧═════════════════════════════════════════════════════════════════════════════════╣
         |║ Bakta database                                                                                  ║
         |╟───────────────┬─────────────────────────────────────────────────────────────────────────────────╢
         |${Texts.dbTextRow('Source', json.bakta_db.url)}
@@ -236,6 +244,7 @@ process PARSE {
         |${Texts.textRow(30, 62, 'Tool', 'Version')}
         |╠════════════════════════════════╪════════════════════════════════════════════════════════════════╣
         |${Texts.toolTextRow(json, 'Python', 'python')}
+        |${Texts.toolTextRow(json, 'pandas', 'pandas')}
         |${Texts.toolTextRow(json, 'fastp', 'fastp')}
         |${Texts.toolTextRow(json, 'Unicycler', 'unicycler')}
         |${Texts.toolTextRow(json, 'Shovill', 'shovill')}
@@ -259,7 +268,7 @@ process PARSE {
         |${Texts.textRow(30, 62, 'Environment For', 'Image')}
         |╠════════════════════════════════╪════════════════════════════════════════════════════════════════╣
         |${Texts.imageTextRow(json, 'Bash', 'bash')}
-        |${Texts.imageTextRow(json, 'Python', 'python')}
+        |${Texts.imageTextRow(json, 'Python / pandas', 'python')}
         |${Texts.imageTextRow(json, 'fastp', 'fastp')}
         |${Texts.imageTextRow(json, 'Unicycler', 'unicycler')}
         |${Texts.imageTextRow(json, 'Shovill', 'shovill')}
@@ -300,12 +309,10 @@ process PRINT {
     )
 }
 
-// Save core software, I/O, assembler, QC parameters, databases, tools, container engine and images information to info.txt at output dir
+// Save core software, I/O, assembler, QC parameters, databases, tools, container engine and images information to info.txt
 process SAVE {
     label 'farm_local'
     
-    publishDir "${output}", mode: "copy"
-
     input:
     tuple val(coreText), val(dbText), val(toolText), val(imageText), val(nprocValue)
     val reads
@@ -345,7 +352,7 @@ process SAVE {
     |${Texts.assemblerTextRow('Option', 'Value')}
     |╠═══════════════════════════╪═════════════════════════════════════════════════════════════════════╣
     |${Texts.assemblerTextRow('Assembler', assembler.capitalize())}
-    |${Texts.assemblerTextRow('Assembler Thread', assembler_thread == 0 ? "${nprocValue} (All Available)" : assembler_thread)}
+    |${Texts.assemblerTextRow('Assembler Thread', assembler_thread == 0 ? "${Math.min(nprocValue as Integer, 16)} (Auto)" : assembler_thread)}
     |${Texts.assemblerTextRow('Minimum contig length', min_contig_length)}
     |╚═══════════════════════════╧═════════════════════════════════════════════════════════════════════╝
     |""".stripMargin()
@@ -402,16 +409,18 @@ process SAVE {
 
 // Below processes get tool versions within container images by running their containers
 
-process PYTHON_VERSION {
+process PYTHON_PANDAS_VERSION {
     label 'python_container'
     label 'farm_low'
 
     output:
-    env 'VERSION'
+    env 'PYTHON_VERSION', emit: python_version
+    env 'PANDAS_VERSION', emit: pandas_version
 
     script:
     '''
-    VERSION=$(python3 --version | sed -r "s/^.*[[:space:]]//")
+    PYTHON_VERSION=$(python3 --version | sed -r "s/^.*[[:space:]]//")
+    PANDAS_VERSION=$(python3 -c "import pandas as pd; print(pd.__version__)")
     '''
 }
 
@@ -430,7 +439,7 @@ process FASTP_VERSION {
 
 process UNICYCLER_VERSION {
     label 'unicycler_container'
-    label 'farm_high'
+    label 'farm_assembler'
 
     output:
     tuple env('VERSION'), env('THREAD')
@@ -444,7 +453,7 @@ process UNICYCLER_VERSION {
 
 process SHOVILL_VERSION {
     label 'shovill_container'
-    label 'farm_high'
+    label 'farm_assembler'
 
     output:
     tuple env('VERSION'), env('THREAD')
@@ -531,6 +540,19 @@ process MLST_VERSION {
     script:
     '''
     VERSION=$(mlst -v | sed -r "s/.*[[:space:]]//")
+    '''
+}
+
+process MLST_LAST_UPDATE {
+    label 'mlst_container'
+    label 'farm_low'
+
+    output:
+    env 'LAST_UPDATE'
+
+    script:
+    '''
+    LAST_UPDATE=$(mlst --info | grep spneumoniae | cut -f 5)
     '''
 }
 

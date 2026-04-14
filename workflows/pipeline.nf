@@ -40,8 +40,6 @@ workflow PIPELINE {
     spneumo_percentage
     non_strep_percentage
     resistance_to_mic
-    output
-    file_publish
 
     main:
     // Get path and prefix of Reference Genome BWA Database, generate from assembly if necessary
@@ -57,7 +55,7 @@ workflow PIPELINE {
     GET_POPPUNK_DB(poppunk_db_remote, db)
     GET_POPPUNK_EXT_CLUSTERS(poppunk_ext_remote, db)
 
-    // Get path to ARIBA database, generate from reference sequences and metadata if ncessary
+    // Get path to ARIBA database, generate from reference sequences and metadata if necessary
     GET_ARIBA_DB(ariba_ref, ariba_metadata, db)
 
     // Get path fo Bakta database, download if necessary
@@ -66,7 +64,7 @@ workflow PIPELINE {
     }
 
     // Get read pairs into Channel raw_read_pairs_ch
-    raw_read_pairs_ch = Channel.fromFilePairs("${reads}/*_{,R}{1,2}{,_001}.{fq,fastq}{,.gz}", checkIfExists: true)
+    raw_read_pairs_ch = channel.fromFilePairs("${reads}/*_{,R}{1,2}{,_001}.{fq,fastq}{,.gz}", checkIfExists: true)
 
     // Basic input files validation
     // Output into Channel FILE_VALIDATION.out.result
@@ -74,8 +72,8 @@ workflow PIPELINE {
 
     // From Channel raw_read_pairs_ch, only output valid reads of samples based on Channel FILE_VALIDATION.out.result
     VALID_READS_ch = FILE_VALIDATION.out.result.join(raw_read_pairs_ch, failOnDuplicate: true)
-                        .filter { it[1] == 'PASS' }
-                        .map { it[0, 2..-1] }
+                        .filter { it -> it[1] == 'PASS' }
+                        .map { it -> it[0, 2..-1] }
 
     // Preprocess valid read pairs
     // Output into Channels PREPROCESS.out.processed_reads & PREPROCESS.out.json
@@ -87,15 +85,15 @@ workflow PIPELINE {
 
     // From Channel PREPROCESS.out.processed_reads, only output reads of samples passed Read QC based on Channel READ_QC.out.result
     READ_QC_PASSED_READS_ch = READ_QC.out.result.join(PREPROCESS.out.processed_reads, failOnDuplicate: true)
-                        .filter { it[1] == 'PASS' }
-                        .map { it[0, 2..-1] }
+                        .filter { it -> it[1] == 'PASS' }
+                        .map { it -> it[0, 2..-1] }
 
     // From Channel READ_QC_PASSED_READS_ch, assemble the preprocess read pairs
-    // Output into Channel ASSEMBLY_ch, and hardlink (default) the assemblies to output directory
+    // Output into Channel ASSEMBLY_ch
     if (assembler == 'shovill') {
-        ASSEMBLY_ch = ASSEMBLY_SHOVILL(READ_QC_PASSED_READS_ch, min_contig_length, assembler_thread, output, file_publish)
+        ASSEMBLY_ch = ASSEMBLY_SHOVILL(READ_QC_PASSED_READS_ch, min_contig_length, assembler_thread)
     } else if (assembler == 'unicycler') {
-        ASSEMBLY_ch = ASSEMBLY_UNICYCLER(READ_QC_PASSED_READS_ch, min_contig_length, assembler_thread, output, file_publish)
+        ASSEMBLY_ch = ASSEMBLY_UNICYCLER(READ_QC_PASSED_READS_ch, min_contig_length, assembler_thread)
     } else {
         log.error("Invalid assembler was selected.") 
         System.exit(1)
@@ -149,7 +147,7 @@ workflow PIPELINE {
     // Merge Channels FILE_VALIDATION.out.result & READ_QC.out.result & ASSEMBLY_QC.out.result & MAPPING_QC.out.result & TAXONOMY_QC.out.result to provide Overall QC Status
     // Output into Channel OVERALL_QC.out.result & OVERALL_QC.out.report
     OVERALL_QC(
-        raw_read_pairs_ch.map{ it[0] }
+        raw_read_pairs_ch.map{ it -> it[0] }
         .join(FILE_VALIDATION.out.result, failOnDuplicate: true, remainder: true)
         .join(READ_QC.out.result, failOnDuplicate: true, remainder: true)
         .join(ASSEMBLY_QC.out.result, failOnDuplicate: true, remainder: true)
@@ -159,23 +157,22 @@ workflow PIPELINE {
 
     // From Channel READ_QC_PASSED_READS_ch, only output reads of samples passed overall QC based on Channel OVERALL_QC.out.result
     OVERALL_QC_PASSED_READS_ch = OVERALL_QC.out.result.join(READ_QC_PASSED_READS_ch, failOnDuplicate: true)
-                        .filter { it[1] == 'PASS' }
-                        .map { it[0, 2..-1] }
+                        .filter { it -> it[1] == 'PASS' }
+                        .map { it -> it[0, 2..-1] }
 
     // From Channel ASSEMBLY_ch, only output assemblies of samples passed overall QC based on Channel OVERALL_QC.out.result
     OVERALL_QC_PASSED_ASSEMBLIES_ch = OVERALL_QC.out.result.join(ASSEMBLY_ch, failOnDuplicate: true)
-                            .filter { it[1] == 'PASS' }
-                            .map { it[0, 2..-1] }
+                            .filter { it -> it[1] == 'PASS' }
+                            .map { it -> it[0, 2..-1] }
 
     // From Channel OVERALL_QC_PASSED_ASSEMBLIES_ch, annotate samples passed overall QC
-    // Hardlink (default) the annotations to output directory
     if (annotation) {
-        ANNOTATE(GET_BAKTA_DB.out.path, OVERALL_QC_PASSED_ASSEMBLIES_ch, output, file_publish)
+        ANNOTATE(GET_BAKTA_DB.out.path, OVERALL_QC_PASSED_ASSEMBLIES_ch)
     }
 
     // From Channel OVERALL_QC_PASSED_ASSEMBLIES_ch, generate PopPUNK query file containing assemblies of samples passed overall QC
     POPPUNK_QFILE = OVERALL_QC_PASSED_ASSEMBLIES_ch
-                    .map { it.join'\t' }
+                    .map { it -> it.join'\t' }
                     .collectFile(name: 'qfile.txt', newLine: true)
 
     // From generated POPPUNK_QFILE, assign GPSC to samples passed overall QC
@@ -202,7 +199,7 @@ workflow PIPELINE {
 
     // Generate sample reports by merging outputs from all result-generating modules
     GENERATE_SAMPLE_REPORT(
-        raw_read_pairs_ch.map{ it[0] }
+        raw_read_pairs_ch.map{ it -> it[0] }
         .join(READ_QC.out.report, failOnDuplicate: true, remainder: true)
         .join(ASSEMBLY_QC.out.report, failOnDuplicate: true, remainder: true)
         .join(MAPPING_QC.out.report, failOnDuplicate: true, remainder: true)
@@ -212,24 +209,27 @@ workflow PIPELINE {
         .join(MLST.out.report, failOnDuplicate: true, remainder: true)
         .join(PARSE_PBP_RESISTANCE.out.report, failOnDuplicate: true, remainder: true)
         .join(PARSE_OTHER_RESISTANCE.out.report, failOnDuplicate: true, remainder: true)
-        .join(LINEAGE.out.reports.flatten().map { [it.name.take(it.name.lastIndexOf('.')), it] }, failOnDuplicate: true, remainder: true) // Turn reports list into channel, and map back Sample_ID based on output file name
-        .map { [it[0], it[1..-1].minus(null)] } // Map Sample_ID to index 0 and all reports (with null entries removed) as a list to index 1
+        .join(LINEAGE.out.reports.flatten().map { it -> [it.name.take(it.name.lastIndexOf('.')), it] }, failOnDuplicate: true, remainder: true) // Turn reports list into channel, and map back Sample_ID based on output file name
+        .map { it -> [it[0], it[1..-1].minus(null)] } // Map Sample_ID to index 0 and all reports (with null entries removed) as a list to index 1
     )
 
     // Generate overall report based on sample reports, ARIBA metadata, resistance to MIC lookup table
-    GENERATE_OVERALL_REPORT(GENERATE_SAMPLE_REPORT.out.report.collect(), ariba_metadata, resistance_to_mic, output)
+    GENERATE_OVERALL_REPORT(GENERATE_SAMPLE_REPORT.out.report.collect(), ariba_metadata, resistance_to_mic)
 
     // Pass databases information to SAVE_INFO sub-workflow
-    DATABASES_INFO = GET_REF_GENOME_BWA_DB.out.path.map { [["bwa_db_path", it]] }
-                        .merge(GET_ARIBA_DB.out.path.map { [["ariba_db_path", it]] })
-                        .merge(GET_KRAKEN2_DB.out.path.map { [["kraken2_db_path", it]] })
-                        .merge(GET_SEROBA_DB.out.path.map { [["seroba_db_path", it]] })
-                        .merge(GET_POPPUNK_DB.out.path.map { [["poppunk_db_path", it]] })
-                        .merge(GET_POPPUNK_EXT_CLUSTERS.out.path.map { [["poppunk_ext_path", it]] })
-                        .merge(annotation ? GET_BAKTA_DB.out.path.map { [["bakta_db_path", it]] } : channel.of([["bakta_db_path", "${db}/bakta"]]) )
+    DATABASES_INFO = GET_REF_GENOME_BWA_DB.out.path.map { it -> [["bwa_db_path", it]] }
+                        .merge(GET_ARIBA_DB.out.path.map { it -> [["ariba_db_path", it]] })
+                        .merge(GET_KRAKEN2_DB.out.path.map { it -> [["kraken2_db_path", it]] })
+                        .merge(GET_SEROBA_DB.out.path.map { it -> [["seroba_db_path", it]] })
+                        .merge(GET_POPPUNK_DB.out.path.map { it -> [["poppunk_db_path", it]] })
+                        .merge(GET_POPPUNK_EXT_CLUSTERS.out.path.map { it -> [["poppunk_ext_path", it]] })
+                        .merge(annotation ? GET_BAKTA_DB.out.path.map { it -> [["bakta_db_path", it]] } : channel.of([["bakta_db_path", "${db}/bakta"]]) )
                         // Save key-value tuples into a map
-                        .map { it.collectEntries() }
+                        .map { it -> it.collectEntries() }
 
     emit:
-    databases_info = DATABASES_INFO
+    overall_report  = GENERATE_OVERALL_REPORT.out.report
+    databases_info  = DATABASES_INFO
+    assemblies      = ASSEMBLY_ch
+    annotations     = annotation ? ANNOTATE.out : channel.empty()
 }

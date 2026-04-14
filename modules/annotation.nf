@@ -27,20 +27,15 @@ process GET_BAKTA_DB {
 }
 
 // Run Bakta to get annotation
-// Publish the annotation to ${output}/annotations directory based on ${file_publish}
 process ANNOTATE {
     label 'bakta_container'
     label 'farm_high'
     
     tag "$sample_id"
 
-    publishDir "${output}/annotations", mode: "${file_publish}"
-
     input:
     path bakta_db
     tuple val(sample_id), path(assembly)
-    val output
-    val file_publish
     
     output:
     tuple val(sample_id), path(gff)

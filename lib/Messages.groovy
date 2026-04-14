@@ -41,10 +41,10 @@ class Messages {
     }
 
     // Workflow selection message
-    public static void workflowSelectMessage(String selectedWorkflow, params, log) {
+    public static void workflowSelectMessage(String selectedWorkflow, reads, output, log) {
         String message
-        File readsDir = new File(params.reads)
-        File outputDir = new File(params.output)
+        File readsDir = new File(reads)
+        File outputDir = new File(output)
 
         switch (selectedWorkflow) {
             case 'pipeline':
@@ -82,10 +82,10 @@ class Messages {
     }
 
     // End message
-    public static void endMessage(String selectedWorkflow, params, workflow, log) {
+    public static void endMessage(String selectedWorkflow, output, workflow, log) {
         String successMessage
         String failMessage
-        File outputDir = new File(params.output)
+        File outputDir = new File(output)
 
         switch (selectedWorkflow) {
             case 'pipeline':

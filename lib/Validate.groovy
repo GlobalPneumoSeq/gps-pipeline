@@ -9,11 +9,11 @@ class Validate {
             annotation: 'boolean',
             reads: 'path_exist',
             output: 'path',
+            file_publish: 'publish_mode',
             db: 'path',
             assembler: 'assembler',
             min_contig_length: 'int',
             assembler_thread: 'int',
-            file_publish: 'publish_mode',
             seroba_db_remote: 'url_targz',
             seroba_kmer: 'int',
             kraken2_db_remote: 'url_targz',
@@ -55,21 +55,12 @@ class Validate {
             validParams.put("singularity_cachedir", "path")
         }
 
-        // For initalisation, skip input and output directories checks
-        // For version, skip all file paths related checks
-        def skippedParams = []
-        if (params.init) {
-            skippedParams = ['reads', 'output']
-        } else if (params.version) {
-            validParams.each {
-                key, value ->
-                if (['path', 'path_exist', 'path_fasta'].contains(value)) {
-                    skippedParams.add(key)
-                }
-            }
+        // For initialisation and version, skip input and output directories checks
+        if (params.init || params.version) {
+            def skippedParams = ['reads', 'output']
+            skippedParams.each { key -> validParams[key] = 'skip' }
         }
-        skippedParams.each { key -> validParams[key] = 'skip' }
-
+        
         // To save invalid parameters in this list
         def invalidParams = []
         // To save invalid parameter values as "parameter : [value, issue]" in this map
@@ -106,7 +97,7 @@ class Validate {
                         invalidValues[key] = [value, 'integer or float value']
                     }
                     break
-
+ 
                 case 'publish_mode':
                     if (!['link', 'symlink', 'copy'].contains(value)) {
                         invalidValues[key] = [value, 'Nextflow publish mode']

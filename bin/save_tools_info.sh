@@ -10,6 +10,7 @@ add_version_and_nproc_value () {
 
 jq -n \
     --argjson python "$(add_version "$PYTHON_VERSION")" \
+    --argjson pandas "$(add_version "$PANDAS_VERSION")" \
     --argjson fastp "$(add_version "$FASTP_VERSION")" \
     --argjson unicycler "$(add_version_and_nproc_value "$UNICYCLER_VERSION" "$UNICYCLER_NPROC_VALUE")" \
     --argjson shovill "$(add_version_and_nproc_value "$SHOVILL_VERSION" "$SHOVILL_NPROC_VALUE")" \

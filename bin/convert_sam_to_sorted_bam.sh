@@ -5,10 +5,7 @@
 AVAILABLE_THREAD=$(nproc)
 THREAD=$(( AVAILABLE_THREAD > MAX_THREAD ? MAX_THREAD : AVAILABLE_THREAD ))
 
-samtools view -@ "$THREAD" -b "$SAM" > "$BAM"
-
-samtools sort -@ "$THREAD" -o "$SORTED_BAM" "$BAM"
-rm "$BAM"
+samtools sort -@ "$THREAD" -o "$SORTED_BAM" "$SAM"
 
 if [ "$LITE" = true ]; then
     rm "$(readlink -f "$SAM")"

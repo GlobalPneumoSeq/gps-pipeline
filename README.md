@@ -1,6 +1,6 @@
 # GPS Pipeline <!-- omit in toc -->
 
-[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-25.04.7-23aa62.svg)](https://www.nextflow.io/)
+[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-25.10.4-23aa62.svg)](https://www.nextflow.io/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/singularity/)
 [![Launch on Seqera Platform](https://img.shields.io/badge/Launch%20%F0%9F%9A%80-Seqera%20Platform-%234256e7)](https://cloud.seqera.io/quicklaunch?pipeline=https://github.com/GlobalPneumoSeq/gps-pipeline)
@@ -61,29 +61,20 @@ If you have used the GPS Pipeline in your research, please cite us in your relev
 
 ## Requirements
 ### Software
-- A POSIX-compatible operating system (e.g. Linux, macOS, Windows with [WSL](https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux)) with Bash 3.2 or later
-    - [Installation guide for WSL on Windows](https://learn.microsoft.com/en-us/windows/wsl/install) by Microsoft
-- Java 17 or later (up to 24) ([OpenJDK](https://openjdk.org/)/[Oracle Java](https://www.oracle.com/java/))
-    - [Installation guide for OpenJDK](https://www.freecodecamp.org/news/install-openjdk-free-java-multi-os-guide/) by freeCodeCamp
-- [Docker](https://www.docker.com/) or [Singularity](https://sylabs.io/singularity/)/[Apptainer](https://apptainer.org/)
-    - Installation guides:
-        - For Linux
-            - [Docker Engine on Linux](https://docs.docker.com/engine/install/) by Docker (must install `docker-compose-plugin` as per the guide)
-            - [Apptainer on Linux](https://apptainer.org/docs/admin/main/installation.html) by Apptainer
-            - (Not recommended) [Docker Desktop for Linux](https://docs.docker.com/desktop/), it is known to [cause permission issues](https://github.com/docker/desktop-linux/issues/81) on Linux, which could prevent the pipeline from working
-        - For macOS
-            - [Docker Desktop on macOS](https://docs.docker.com/desktop/install/mac-install/) by Docker
-              - need to [allow Docker to access enough system resources](https://docs.docker.com/desktop/settings/mac/), especially CPU and Memory
-    - For Windows with WSL
-        - [Docker Desktop on Windows with WSL](https://docs.docker.com/desktop/wsl/) by Docker
+- A POSIX-compatible operating system (e.g. Linux, macOS, Windows [with WSL2](https://learn.microsoft.com/en-us/windows/wsl/install)) with Bash 3.2 or later
+- Java 17 or later (up to 25) (use [SDKMAN!](https://sdkman.io/install/) to install an appropiate version of [Temurin distribution](https://sdkman.io/jdks/tem/))
+- [Docker](https://www.docker.com/) or [Singularity](https://sylabs.io/singularity/) / [Apptainer](https://apptainer.org/)
+    - Linux: [Docker Engine](https://docs.docker.com/engine/install/) / [Apptainer](https://apptainer.org/docs/admin/main/installation.html)
+    - macOS: [Docker Desktop for macOS](https://docs.docker.com/desktop/setup/install/mac-install/) ([need to allow Docker to access enough CPUs and memory](https://docs.docker.com/desktop/settings/mac/))
+    - Windows with WSL2: [Docker Desktop for WSL2](https://docs.docker.com/desktop/features/wsl/)
 
 ### Hardware 
 It is recommended to have at least 16GB of RAM and 100GB of free storage
 > [!NOTE] 
 > - The pipeline core files use ~6MB
-> - All default databases use ~20GB in total (the optional Bakta database for annotation use an additional ~4GB)
-> - All Docker images use ~14GB in total; alternatively, Singularity images use ~4.7GB in total
-> - The pipeline generates ~1.8GB intermediate files for each sample on average
+> - All default databases use ~13GB in total (the optional Bakta database for annotation use an additional ~4GB)
+> - All Docker images use ~16GB in total; alternatively, Singularity images use ~5.5GB in total
+> - The pipeline generates ~2GB intermediate files for each sample on average
 >     - These files can be removed when the pipeline run is completed, please refer to [Clean Up](#clean-up)
 >     - To further reduce storage requirement by sacrificing the ability to resume the pipeline, please refer to [Experimental](#experimental)
 ## Accepted Inputs
@@ -259,7 +250,7 @@ The pipeline is compatible with [Launchpad](https://docs.seqera.io/platform/late
 | Option | Values | Description |
 | --- | ---| --- |
 | `--assembler` | `"shovill"` or `"unicycler"`<br />(Default: `"shovill"`)| Using which SPAdes-based assembler to assemble the reads. |
-| `--assembler_thread` | Any integer value<br />(Default: `0`) | Number of threads used by the assembler. `0` means all available. |
+| `--assembler_thread` | Any integer value<br />(Default: `0`) | Number of threads used by the assembler. `0` enables auto-detection of available cores (up to a maximum of `16`). |
 | `--min_contig_length` | Any integer value<br />(Default: `500`) | Minimum legnth of contig to be included in the assembly. |
 
 ## Mapping
@@ -276,14 +267,14 @@ The pipeline is compatible with [Launchpad](https://docs.seqera.io/platform/late
 ## Serotype
 | Option | Values | Description |
 | --- | ---| --- |
-| `--seroba_db_remote` | Any valid URL to a SeroBA release in `.tar.gz` or `.tgz` format<br />(Default: [SeroBA v2.0.5](https://github.com/GlobalPneumoSeq/seroba/archive/refs/tags/v2.0.5.tar.gz))| URL to a SeroBA release. |
+| `--seroba_db_remote` | Any valid URL to a SeroBA release in `.tar.gz` or `.tgz` format<br />(Default: [SeroBA v2.0.6](https://github.com/GlobalPneumoSeq/seroba/archive/refs/tags/v2.0.6.tar.gz))| URL to a SeroBA release. |
 | `--seroba_kmer` | Any integer value<br />(Default: `71`) | Kmer size for creating the KMC database of SeroBA. |
 
 ## Lineage
 | Option | Values | Description |
 | --- | ---| --- |
-| `--poppunk_db_remote` | Any valid URL to a PopPUNK database in `.tar.gz` or `.tgz` format<br />(Default: [GPS v10](https://gps-project.cog.sanger.ac.uk/GPS_v10.tar.gz)) | URL to a PopPUNK database. |
-| `--poppunk_ext_remote` | Any valid URL to a PopPUNK external clusters file in `.csv` format<br />(Default: [GPS v10 GPSC Designation](https://gps-project.cog.sanger.ac.uk/GPS_v10_external_clusters.csv)) | URL to a PopPUNK external clusters file. |
+| `--poppunk_db_remote` | Any valid URL to a PopPUNK database in `.tar.gz` or `.tgz` format<br />(Default: [GPS v11](https://gps-project.cog.sanger.ac.uk/GPS_v11.tar.gz)) | URL to a PopPUNK database. |
+| `--poppunk_ext_remote` | Any valid URL to a PopPUNK external clusters file in `.csv` format<br />(Default: [GPS v11 GPSC Designation](https://gps-project.cog.sanger.ac.uk/GPS_v11_external_clusters.csv)) | URL to a PopPUNK external clusters file. |
 
 ## Other AMR
 | Option | Values | Description |
