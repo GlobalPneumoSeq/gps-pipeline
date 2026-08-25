@@ -62,7 +62,7 @@ If you have used the GPS Pipeline in your research, please cite us in your relev
 ## Requirements
 ### Software
 - A POSIX-compatible operating system (e.g. Linux, macOS, Windows [with WSL2](https://learn.microsoft.com/en-us/windows/wsl/install)) with Bash 3.2 or later
-- Java 17 or later (up to 25) (use [SDKMAN!](https://sdkman.io/install/) to install an appropiate version of [Temurin distribution](https://sdkman.io/jdks/tem/))
+- Java 17 or later (up to 26) (use [SDKMAN!](https://sdkman.io/install/) to install an appropiate version of [Temurin distribution](https://sdkman.io/jdks/tem/))
 - [Docker](https://www.docker.com/) or [Singularity](https://sylabs.io/singularity/) / [Apptainer](https://apptainer.org/)
     - Linux: [Docker Engine](https://docs.docker.com/engine/install/) / [Apptainer](https://apptainer.org/docs/admin/main/installation.html)
     - macOS: [Docker Desktop for macOS](https://docs.docker.com/desktop/setup/install/mac-install/) ([need to allow Docker to access enough CPUs and memory](https://docs.docker.com/desktop/settings/mac/))
