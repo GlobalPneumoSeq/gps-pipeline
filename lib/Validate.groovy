@@ -33,7 +33,8 @@ class Validate {
             ariba_ref: 'path_fasta',
             ariba_metadata: 'path_tsv',
             resistance_to_mic: 'path_tsv',
-            lite: 'boolean'
+            lite: 'boolean',
+            singularity_cachedir: 'skip'
         ]
 
         // Ensure only one or none of the alternative workflows is selected
@@ -50,9 +51,9 @@ class Validate {
             return
         }
 
-        // Add params.singularity_cachedir when workflow.containerEngine == 'singularity'
+        // Check params.singularity_cachedir when workflow.containerEngine == 'singularity'
         if (workflow.containerEngine == 'singularity') {
-            validParams.put("singularity_cachedir", "path")
+            validParams["singularity_cachedir"] = "path"
         }
 
         // For initialisation and version, skip input and output directories checks

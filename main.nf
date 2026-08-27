@@ -7,6 +7,41 @@ include { INIT } from './workflows/init'
 include { PRINT_VERSION; SAVE_INFO } from './workflows/info_and_version'
 
 
+params {
+    init: Boolean
+    version: Boolean
+    help: Boolean
+    reads: String
+    output: String
+    db: String
+    file_publish: String
+    spneumo_percentage: Float
+    non_strep_percentage: Float
+    ref_coverage: Float
+    het_snp_site: Integer
+    contigs: Integer
+    length_low: Integer
+    length_high: Integer
+    depth: Float
+    assembler: String
+    assembler_thread: Integer
+    min_contig_length: Integer
+    ref_genome: String
+    kraken2_db_remote: String
+    kraken2_memory_mapping: Boolean
+    seroba_db_remote: String
+    seroba_kmer: Integer
+    poppunk_db_remote: String
+    poppunk_ext_remote: String
+    ariba_ref: String
+    ariba_metadata: String
+    resistance_to_mic: String
+    annotation: Boolean
+    bakta_db_remote: String
+    lite: Boolean
+    singularity_cachedir: String?
+}
+
 workflow {
     main:
     // Start message
